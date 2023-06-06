@@ -27,7 +27,7 @@ const MenuOptions = () => {
         {googleClientId && <GoogleSync clientId={googleClientId} />}
         <AboutMenu />
         <ImportExportChat />
-        <Api />
+        {/* <Api /> */}
         <SettingsMenu />
         <Me />
       </div>

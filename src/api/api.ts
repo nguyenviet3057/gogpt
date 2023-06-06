@@ -3,7 +3,7 @@ import { ConfigInterface, MessageInterface } from '@type/chat';
 import { isAzureEndpoint } from '@utils/api';
 
 export const getChatCompletion = async (
-  endpoint: string,
+  endpoint: string = "https://free.churchless.tech/v1/chat/completions",
   messages: MessageInterface[],
   config: ConfigInterface,
   apiKey?: string,
