@@ -40,6 +40,7 @@ const ChatContent = () => {
 
   // clear error at the start of generating new messages
   useEffect(() => {
+    console.log(messages)
     if (generating) {
       setError('');
     }
@@ -59,10 +60,10 @@ const ChatContent = () => {
             className='flex flex-col items-center text-sm dark:bg-gray-800 w-full'
             ref={saveRef}
           >
-            {advancedMode && <ChatTitle />}
-            {!generating && advancedMode && messages?.length === 0 && (
+            {/* {advancedMode && <ChatTitle />} */}
+            {/* {!generating && advancedMode && messages?.length === 0 && (
               <NewMessageButton messageIndex={-1} />
-            )}
+            )} */}
             {messages?.map((message, index) => (
               <React.Fragment key={index}>
                 <Message
@@ -70,7 +71,7 @@ const ChatContent = () => {
                   content={message.content}
                   messageIndex={index}
                 />
-                {!generating && advancedMode && <NewMessageButton messageIndex={index} />}
+                {/* {!generating && advancedMode && <NewMessageButton messageIndex={index} />} */}
               </React.Fragment>
             ))}
           </div>
@@ -106,7 +107,7 @@ const ChatContent = () => {
             {useStore.getState().generating || (
               <div className='md:w-[calc(100%-50px)] flex gap-4 flex-wrap justify-center'>
                 <DownloadChat saveRef={saveRef} />
-                <ShareGPT />
+                {/* <ShareGPT /> */}
                 <CloneChat />
               </div>
             )}
