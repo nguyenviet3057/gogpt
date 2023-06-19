@@ -40,7 +40,6 @@ const ChatContent = () => {
 
   // clear error at the start of generating new messages
   useEffect(() => {
-    console.log(messages)
     if (generating) {
       setError('');
     }

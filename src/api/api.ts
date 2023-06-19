@@ -6,7 +6,7 @@ export const getChatCompletion = async (
   endpoint: string = "https://free.churchless.tech/v1/chat/completions",
   messages: MessageInterface[],
   config: ConfigInterface,
-  apiKey?: string,
+  apiKey: string = "MyDiscord",
   customHeaders?: Record<string, string>
 ) => {
   const headers: HeadersInit = {
@@ -52,7 +52,7 @@ export const getChatCompletionStream = async (
   endpoint: string,
   messages: MessageInterface[],
   config: ConfigInterface,
-  apiKey?: string,
+  apiKey: string = "MyDiscord",
   customHeaders?: Record<string, string>
 ) => {
   const headers: HeadersInit = {
