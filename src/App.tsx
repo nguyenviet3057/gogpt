@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import useStore from '@store/store';
 import i18n from './i18n';
 
@@ -11,6 +11,11 @@ import { Theme } from '@type/theme';
 import ApiPopup from '@components/ApiPopup';
 import Toast from '@components/Toast';
 
+import { load } from 'react-cookies';
+
+import { default as OAuth2Facebook } from '@components/OAuth2/facebook';
+import { AppConfig } from '@constants/config';
+
 function App() {
   const initialiseNewChat = useInitialiseNewChat();
   const setChats = useStore((state) => state.setChats);
@@ -18,16 +23,42 @@ function App() {
   const setApiKey = useStore((state) => state.setApiKey);
   const setCurrentChatIndex = useStore((state) => state.setCurrentChatIndex);
 
+  const [isLogged, setIsLogged] = useState(false);
+  const [checkedAuth, setCheckedAuth] = useState(false);
+
   useEffect(() => {
     document.documentElement.lang = i18n.language;
     i18n.on('languageChanged', (lng) => {
       document.documentElement.lang = lng;
     });
+
+    fetch(AppConfig.BASE_URL + AppConfig.CHECK_AUTH, {
+      method: 'POST',
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + load('access_token')
+      },
+      body: null
+    })
+      .then(response => {
+        // console.log(response);
+        return response.status
+      })
+      .then(result => {
+        // console.log('Response:', result);
+        if (result == 200) setIsLogged(true);
+        setCheckedAuth(true);
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
   }, []);
 
   useEffect(() => {
     // legacy local storage
-    const oldChats = localStorage.getItem('chats');
+    // const oldChats = localStorage.getItem('chats');
+    const oldChats = JSON.stringify({});
     const apiKey = localStorage.getItem('apiKey');
     const theme = localStorage.getItem('theme');
 
@@ -76,10 +107,18 @@ function App() {
 
   return (
     <div className='overflow-hidden w-full h-full relative'>
-      <Menu />
-      <Chat />
-      {/* <ApiPopup /> */}
-      <Toast />
+
+      {isLogged ?
+        <>
+          <Menu setIsLogged={setIsLogged}/>
+          <Chat />
+          {/* <ApiPopup /> */}
+          <Toast />
+        </>
+        :
+        <OAuth2Facebook checkedAuth={checkedAuth} setIsLogged={setIsLogged} />
+      }
+
     </div>
   );
 }

@@ -11,11 +11,13 @@ import TokenCount from '@components/TokenCount';
 import CommandPrompt from '../CommandPrompt';
 
 const EditView = ({
+  isText,
   content,
   setIsEdit,
   messageIndex,
   sticky,
 }: {
+  isText: boolean;
   content: string;
   setIsEdit: React.Dispatch<React.SetStateAction<boolean>>;
   messageIndex: number;
@@ -101,7 +103,7 @@ const EditView = ({
       setIsEdit(false);
     }
     setChats(updatedChats);
-    handleSubmit();
+    handleSubmit(isText);
   };
 
   useEffect(() => {

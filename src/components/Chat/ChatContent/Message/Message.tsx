@@ -16,11 +16,13 @@ const backgroundStyle = ['dark:bg-gray-800', 'bg-gray-50 dark:bg-gray-650'];
 
 const Message = React.memo(
   ({
+    isText,
     role,
     content,
     messageIndex,
     sticky = false,
   }: {
+    isText: boolean;
     role: Role;
     content: string;
     messageIndex: number;
@@ -51,6 +53,7 @@ const Message = React.memo(
                 sticky={sticky}
               />} */}
             <MessageContent
+              isText={isText}
               role={role}
               content={content}
               messageIndex={messageIndex}

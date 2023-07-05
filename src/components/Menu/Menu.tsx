@@ -11,9 +11,11 @@ import CrossIcon2 from '@icon/CrossIcon2';
 import DownArrow from '@icon/DownArrow';
 import MenuIcon from '@icon/MenuIcon';
 
-const Menu = () => {
+const Menu = (props: any) => {
   const hideSideMenu = useStore((state) => state.hideSideMenu);
   const setHideSideMenu = useStore((state) => state.setHideSideMenu);
+
+  const { setIsLogged } = props;
 
   const windowWidthRef = useRef<number>(window.innerWidth);
 
@@ -44,7 +46,7 @@ const Menu = () => {
                 <NewFolder />
               </div>
               <ChatHistoryList />
-              <MenuOptions />
+              <MenuOptions setIsLogged={setIsLogged} />
             </nav>
           </div>
         </div>

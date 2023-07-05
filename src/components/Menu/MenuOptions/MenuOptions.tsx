@@ -9,12 +9,16 @@ import SettingsMenu from '@components/SettingsMenu';
 import CollapseOptions from './CollapseOptions';
 import GoogleSync from '@components/GoogleSync';
 import { TotalTokenCostDisplay } from '@components/SettingsMenu/TotalTokenCost';
+import Logout from './Logout';
 
 const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || undefined;
 
-const MenuOptions = () => {
+const MenuOptions = (props: any) => {
   const hideMenuOptions = useStore((state) => state.hideMenuOptions);
   const countTotalTokens = useStore((state) => state.countTotalTokens);
+
+  const { setIsLogged } = props;
+
   return (
     <>
       <CollapseOptions />
@@ -25,11 +29,12 @@ const MenuOptions = () => {
       >
         {countTotalTokens && <TotalTokenCostDisplay />}
         {googleClientId && <GoogleSync clientId={googleClientId} />}
-        <AboutMenu />
-        <ImportExportChat />
+        {/* <AboutMenu /> */}
+        {/* <ImportExportChat /> */}
         {/* <Api /> */}
         <SettingsMenu />
         <Me />
+        <Logout setIsLogged={setIsLogged}/>
       </div>
     </>
   );

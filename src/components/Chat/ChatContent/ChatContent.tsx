@@ -13,9 +13,12 @@ import DownloadChat from './DownloadChat';
 import CloneChat from './CloneChat';
 import ShareGPT from '@components/ShareGPT';
 
-const ChatContent = () => {
+const ChatContent = (props: any) => {
   const inputRole = useStore((state) => state.inputRole);
   const setError = useStore((state) => state.setError);
+  
+  const { isText } = props;
+
   const messages = useStore((state) =>
     state.chats &&
     state.chats.length > 0 &&
@@ -66,6 +69,7 @@ const ChatContent = () => {
             {messages?.map((message, index) => (
               <React.Fragment key={index}>
                 <Message
+                  isText={isText}
                   role={message.role}
                   content={message.content}
                   messageIndex={index}
@@ -76,6 +80,7 @@ const ChatContent = () => {
           </div>
 
           <Message
+            isText={isText}
             role={inputRole}
             content=''
             messageIndex={stickyIndex}

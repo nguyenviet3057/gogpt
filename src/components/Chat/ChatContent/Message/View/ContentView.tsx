@@ -2,6 +2,7 @@ import React, {
   DetailedHTMLProps,
   HTMLAttributes,
   memo,
+  useEffect,
   useState,
 } from 'react';
 
@@ -49,6 +50,20 @@ const ContentView = memo(
 
     const [isDelete, setIsDelete] = useState<boolean>(false);
 
+    const [isBase64, setIsBase64] = useState(false);
+    const [src, setSrc] = useState("");
+
+    useEffect(() => {
+      try {
+        let img = JSON.parse(content);
+        setIsBase64(true);
+        setSrc(img.base64);
+        console.log(src);
+      } catch (e: any) {
+        console.log(content);
+      }
+    })
+
     const currentChatIndex = useStore((state) => state.currentChatIndex);
     const setChats = useStore((state) => state.setChats);
     const lastMessageIndex = useStore((state) =>
@@ -89,14 +104,14 @@ const ContentView = memo(
       handleMove('down');
     };
 
-    const handleRefresh = () => {
+    const handleRefresh = (isText: boolean) => {
       const updatedChats: ChatInterface[] = JSON.parse(
         JSON.stringify(useStore.getState().chats)
       );
       const updatedMessages = updatedChats[currentChatIndex].messages;
       updatedMessages.splice(updatedMessages.length - 1, 1);
       setChats(updatedChats);
-      handleSubmit();
+      handleSubmit(isText);
     };
 
     const handleCopy = () => {
@@ -106,34 +121,44 @@ const ContentView = memo(
     return (
       <>
         <div className='markdown prose w-full md:max-w-full break-words dark:prose-invert dark share-gpt-message'>
-          {markdownMode ? (
-            <ReactMarkdown
-              remarkPlugins={[
-                remarkGfm,
-                [remarkMath, { singleDollarTextMath: inlineLatex }],
-              ]}
-              rehypePlugins={[
-                rehypeKatex,
-                [
-                  rehypeHighlight,
-                  {
-                    detect: true,
-                    ignoreMissing: true,
-                    subset: codeLanguageSubset,
-                  },
-                ],
-              ]}
-              linkTarget='_new'
-              components={{
-                code,
-                p,
-              }}
-            >
-              {content}
-            </ReactMarkdown>
-          ) : (
-            <span className='whitespace-pre-wrap'>{content}</span>
-          )}
+          {markdownMode ?
+            isBase64 ?
+              <div>
+                <img src={src}/>
+              </div>
+              :
+              <ReactMarkdown
+                remarkPlugins={[
+                  remarkGfm,
+                  [remarkMath, { singleDollarTextMath: inlineLatex }],
+                ]}
+                rehypePlugins={[
+                  rehypeKatex,
+                  [
+                    rehypeHighlight,
+                    {
+                      detect: true,
+                      ignoreMissing: true,
+                      subset: codeLanguageSubset,
+                    },
+                  ],
+                ]}
+                linkTarget='_new'
+                components={{
+                  code,
+                  p,
+                }}
+              >
+                {content}
+              </ReactMarkdown>
+           : 
+            isBase64 ?
+              <div>
+                <img src={src}/>
+              </div>
+              :
+              <span className='whitespace-pre-wrap'>{content}</span>
+          }
         </div>
         <div className='flex justify-end gap-2 w-full mt-2'>
           {isDelete || (
@@ -141,7 +166,7 @@ const ContentView = memo(
               {!useStore.getState().generating &&
                 role === 'assistant' &&
                 messageIndex === lastMessageIndex && (
-                  <RefreshButton onClick={handleRefresh} />
+                  <RefreshButton onClick={() => handleRefresh(!isBase64)} />
                 )}
               {/* {messageIndex !== 0 && <UpButton onClick={handleMoveUp} />}
               {messageIndex !== lastMessageIndex && (
