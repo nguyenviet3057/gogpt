@@ -42,7 +42,7 @@ export default function facebook(props: any) {
         <div className="login-container">
             <div>
                 <a href="https://www.facebook.com/planxdev/">
-                    <img src="/logo_planx.jpg" alt="PlanX" className='logo-front' />
+                    <img src="logo_planx.jpg" alt="PlanX" className='logo-front' />
                 </a>
             </div>
             <div className="login-box">
