@@ -8,15 +8,18 @@ const Logout = (props: any) => {
   const { setIsLogged } = props;
 
   const handleLogout = () => {
-    fetch(AppConfig.BASE_URL + AppConfig.LOGOUT, {
+    var myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
+
+    var urlencoded = new URLSearchParams();
+    urlencoded.append("Authorization", `Bearer ${load("access_token")}`);
+
+    var requestOptions = {
       method: 'POST',
-      headers: {
-        "Accept": "application/json",
-        "Content-Type": "application/json",
-        "Authorization": "Bearer " + load('access_token')
-      },
-      body: null
-    })
+      headers: myHeaders,
+      body: urlencoded
+    };
+    fetch(AppConfig.BASE_URL + AppConfig.LOGOUT, requestOptions)
       .then(response => response.status)
       .then(result => {
         // console.log('Response:', result);

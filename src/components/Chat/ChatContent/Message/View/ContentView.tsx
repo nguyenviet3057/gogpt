@@ -58,9 +58,9 @@ const ContentView = memo(
         let img = JSON.parse(content);
         setIsBase64(true);
         setSrc(img.base64);
-        console.log(src);
+        // console.log(src);
       } catch (e: any) {
-        console.log(content);
+        // console.log(content);
       }
     })
 

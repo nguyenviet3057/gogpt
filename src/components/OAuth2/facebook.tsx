@@ -25,7 +25,7 @@ export default function facebook(props: any) {
             body: urlencoded
         };
 
-        fetch("https://planx-dev.000webhostapp.com/api/login/facebook", requestOptions)
+        fetch(AppConfig.BASE_URL + AppConfig.LOGIN_FACEBOOK, requestOptions)
             .then(response => {
                 // console.log(response);
                 if (response.status == 200) setIsLogged(true);
@@ -50,31 +50,39 @@ export default function facebook(props: any) {
                     <TypeAnimation
                         sequence={[
                             // Same substring at the start will only be typed out once, initially
-                            '// Welcome to PlanX //',
-                            3000, // wait 1s before replacing "Mice" with "Hamsters"
-                            'We do it for you',
+                            'Welcome to PlanX\n// where we do it for you //',
+                            4000, // wait 1s before replacing "Mice" with "Hamsters"
+                            'Be yourself\n// to feel free //',
+                            3000,
+                            'Follow your dream\n// to have motivation //',
+                            3000,
+                            'Make your life better\n// to live more //',
                             3000
                         ]}
                         wrapper="h2"
                         speed={50}
-                        style={{ fontSize: 'x-large', display: 'block', color: 'white' }}
+                        style={{ whiteSpace: 'pre-line', fontSize: 'x-large', display: 'block', color: 'white' }}
                         repeat={Infinity}
                         cursor={false}
                     />
-                    <TypeAnimation
+                    {/* <TypeAnimation
                         sequence={[
                             // Same substring at the start will only be typed out once, initially
-                            '// Welcome to PlanX //',
-                            3000, // wait 1s before replacing "Mice" with "Hamsters"
-                            'We do it for you',
+                            '// where we do it for you //',
+                            4000, // wait 1s before replacing "Mice" with "Hamsters"
+                            '// to feel free //',
+                            3000,
+                            '// to have motivation //',
+                            3000,
+                            '// to live more //',
                             3000
                         ]}
-                        wrapper="h3"
+                        wrapper="h2"
                         speed={50}
                         style={{ fontSize: 'medium', display: 'block', color: 'gray' }}
                         repeat={Infinity}
                         cursor={false}
-                    />
+                    /> */}
                 </div>
                 {checkedAuth ?
                     <LoginSocialFacebook

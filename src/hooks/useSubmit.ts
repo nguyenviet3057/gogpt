@@ -206,19 +206,21 @@ const useSubmit = () => {
       try {
         let messages = chats[currentChatIndex].messages;
         let prompt = messages[messages.length - 1].content
-        console.log(prompt);
-        let data = {
-          prompt: prompt
-        }
-        fetch(AppConfig.BASE_URL + AppConfig.TXT2IMG, {
-          method: 'POST',
-          headers: {
-            "Accept": "application/json",
-            "Content-Type": "application/json",
-            "Authorization": "Bearer " + load('access_token')
-          },
-          body: JSON.stringify(data)
-        })
+
+        var myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
+
+        var urlencoded = new URLSearchParams();
+        urlencoded.append("Authorization", `Bearer ${load("access_token")}`);
+        urlencoded.append("prompt", prompt);
+        
+        var requestOptions = {
+            method: 'POST',
+            headers: myHeaders,
+            body: urlencoded
+        };
+
+        fetch(AppConfig.BASE_URL + AppConfig.TXT2IMG, requestOptions)
           .then(response => {
             console.log(response);
             return response.json()
