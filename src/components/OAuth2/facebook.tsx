@@ -11,19 +11,21 @@ export default function facebook(props: any) {
 
     const loginSuccess = (response: any) => {
         // console.log(response.data.userID);
-        let data = {
-            userID: response.data.userID,
-            email: response.data.email,
-            name: response.data.name
-        }
-        fetch(AppConfig.BASE_URL + AppConfig.LOGIN_FACEBOOK, {
+        var myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
+
+        var urlencoded = new URLSearchParams();
+        urlencoded.append("userID", response.data.userID);
+        urlencoded.append("email", response.data.email);
+        urlencoded.append("name", response.data.name);
+
+        var requestOptions = {
             method: 'POST',
-            headers: {
-                "Accept": "application/json",
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(data)
-        })
+            headers: myHeaders,
+            body: urlencoded
+        };
+
+        fetch("https://planx-dev.000webhostapp.com/api/login/facebook", requestOptions)
             .then(response => {
                 // console.log(response);
                 if (response.status == 200) setIsLogged(true);
@@ -33,9 +35,7 @@ export default function facebook(props: any) {
                 // console.log('Response:', result);
                 save("access_token", result.token, {});
             })
-            .catch(error => {
-                console.error('Error:', error);
-            });
+            .catch(error => console.log('error', error));
     }
 
     return (
@@ -76,7 +76,7 @@ export default function facebook(props: any) {
                         cursor={false}
                     />
                 </div>
-                {checkedAuth ? 
+                {checkedAuth ?
                     <LoginSocialFacebook
                         appId='959812971924470'
                         onResolve={(response) => loginSuccess(response)}

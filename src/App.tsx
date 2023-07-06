@@ -32,15 +32,19 @@ function App() {
       document.documentElement.lang = lng;
     });
 
-    fetch(AppConfig.BASE_URL + AppConfig.CHECK_AUTH, {
+    var myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
+
+    var urlencoded = new URLSearchParams();
+    urlencoded.append("Authorization", `Bearer ${load("access_token")}`);
+
+    var requestOptions = {
       method: 'POST',
-      headers: {
-        "Accept": "application/json",
-        "Content-Type": "application/json",
-        "Authorization": "Bearer " + load('access_token')
-      },
-      body: null
-    })
+      headers: myHeaders,
+      body: urlencoded
+    };
+
+    fetch(AppConfig.BASE_URL + AppConfig.CHECK_AUTH, requestOptions)
       .then(response => {
         // console.log(response);
         return response.status
@@ -110,7 +114,7 @@ function App() {
 
       {isLogged ?
         <>
-          <Menu setIsLogged={setIsLogged}/>
+          <Menu setIsLogged={setIsLogged} />
           <Chat />
           {/* <ApiPopup /> */}
           <Toast />
