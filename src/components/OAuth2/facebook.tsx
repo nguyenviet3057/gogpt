@@ -86,7 +86,7 @@ export default function facebook(props: any) {
                 </div>
                 {checkedAuth ?
                     <LoginSocialFacebook
-                        appId='959812971924470'
+                        appId='971391800706097'
                         onResolve={(response) => loginSuccess(response)}
                         onReject={(error) => {
                             // console.log(error);
