@@ -3,10 +3,10 @@ import { ConfigInterface, MessageInterface } from '@type/chat';
 import { isAzureEndpoint } from '@utils/api';
 
 export const getChatCompletion = async (
-  endpoint: string = "https://free.churchless.tech/v1/chat/completions",
+  endpoint: string,
   messages: MessageInterface[],
   config: ConfigInterface,
-  apiKey: string = "MyDiscord",
+  apiKey?: string,
   customHeaders?: Record<string, string>
 ) => {
   const headers: HeadersInit = {
@@ -52,7 +52,7 @@ export const getChatCompletionStream = async (
   endpoint: string,
   messages: MessageInterface[],
   config: ConfigInterface,
-  apiKey: string = "MyDiscord",
+  apiKey?: string,
   customHeaders?: Record<string, string>
 ) => {
   const headers: HeadersInit = {
