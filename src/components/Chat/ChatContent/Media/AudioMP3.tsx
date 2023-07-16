@@ -6,7 +6,7 @@ function AudioMP3(props: any) {
     const { src, autoPlay, index, handleMediaNum } = props;
 
     const handleEnded = () => {
-        console.log(index);
+        // console.log(index);
         handleMediaNum(index + 1);
     }
 

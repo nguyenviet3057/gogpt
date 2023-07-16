@@ -130,7 +130,7 @@ const ContentView = memo(
     };
 
     const handleMediaNum = (num: any) => {
-      console.log(num);
+      // console.log(num);
       setMediaNum(num);
     }
 
