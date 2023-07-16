@@ -3882,6 +3882,11 @@
     "trough" "^2.0.0"
     "vfile" "^5.0.0"
 
+"uninstall@^0.0.0":
+  "integrity" "sha512-pjP/0+A4gsbDVa8XH/S2GZdT9NPJW8NFMy3GI7HnsWG+NAmFSSj3QidNosXBI9cPtxxNExEDdhKFO6sli8K3mA=="
+  "resolved" "https://registry.npmjs.org/uninstall/-/uninstall-0.0.0.tgz"
+  "version" "0.0.0"
+
 "unist-util-find-after@^4.0.0":
   "integrity" "sha512-QO/PuPMm2ERxC6vFXEPtmAutOopy5PknD+Oq64gGwxKtk4xwo9Z97t9Av1obPmGU0IyTa6EKYUfTrK2QJS3Ozw=="
   "resolved" "https://registry.npmjs.org/unist-util-find-after/-/unist-util-find-after-4.0.1.tgz"
