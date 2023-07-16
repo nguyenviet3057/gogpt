@@ -33,6 +33,7 @@ import DeleteButton from './Button/DeleteButton';
 import MarkdownModeButton from './Button/MarkdownModeButton';
 
 import CodeBlock from '../CodeBlock';
+import AudioMP3 from '../../Media/AudioMP3';
 
 const ContentView = memo(
   ({
@@ -50,19 +51,29 @@ const ContentView = memo(
 
     const [isDelete, setIsDelete] = useState<boolean>(false);
 
-    const [isBase64, setIsBase64] = useState(false);
-    const [src, setSrc] = useState("");
+    const [numFunction, setNumFunction] = useState(0);
+    const [imageSrc, setImageSrc] = useState("");
+    const [mediaSrc, setMediaSrc] = useState([]);
+    const [mediaNum, setMediaNum] = useState(0);
 
     useEffect(() => {
       try {
-        let img = JSON.parse(content);
-        setIsBase64(true);
-        setSrc(img.base64);
-        // console.log(src);
+        let data = JSON.parse(content);
+        const base64Regex = /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/;
+        if (base64Regex.test(data)) {
+          setNumFunction(1);
+          setImageSrc(data.base64);
+        }
+        if (data.type == "media") {
+          setNumFunction(2);
+          setMediaSrc(data.media_links);
+        }
+        console.log(numFunction);
       } catch (e: any) {
         // console.log(content);
       }
-    })
+      console.log(mediaNum);
+    }, [numFunction, mediaNum]);
 
     const currentChatIndex = useStore((state) => state.currentChatIndex);
     const setChats = useStore((state) => state.setChats);
@@ -104,29 +115,30 @@ const ContentView = memo(
       handleMove('down');
     };
 
-    const handleRefresh = (isText: boolean) => {
+    const handleRefresh = (numFunction: Number) => {
       const updatedChats: ChatInterface[] = JSON.parse(
         JSON.stringify(useStore.getState().chats)
       );
       const updatedMessages = updatedChats[currentChatIndex].messages;
       updatedMessages.splice(updatedMessages.length - 1, 1);
       setChats(updatedChats);
-      handleSubmit(isText);
+      handleSubmit(numFunction);
     };
 
     const handleCopy = () => {
       navigator.clipboard.writeText(content);
     };
 
+    const handleMediaNum = (num: any) => {
+      console.log(num);
+      setMediaNum(num);
+    }
+
     return (
       <>
         <div className='markdown prose w-full md:max-w-full break-words dark:prose-invert dark share-gpt-message'>
           {markdownMode ?
-            isBase64 ?
-              <div>
-                <img src={src}/>
-              </div>
-              :
+            numFunction == 0 ?
               <ReactMarkdown
                 remarkPlugins={[
                   remarkGfm,
@@ -151,13 +163,37 @@ const ContentView = memo(
               >
                 {content}
               </ReactMarkdown>
-           : 
-            isBase64 ?
-              <div>
-                <img src={src}/>
-              </div>
               :
+              numFunction == 1 ?
+                <div>
+                  <img src={imageSrc} />
+                </div>
+                :
+                <div>
+                  {
+                    mediaSrc.map((src, index) => (
+                      <>
+                        <AudioMP3 handleMediaNum={handleMediaNum} key={index} index={index} src={src} autoPlay={index == mediaNum} />
+                      </>
+                    ))
+                  }
+                </div>
+            :
+            numFunction == 0 ?
               <span className='whitespace-pre-wrap'>{content}</span>
+              :
+              numFunction == 1 ?
+                <div>
+                  <img src={imageSrc} />
+                </div>
+                :
+                <>
+                  {
+                    mediaSrc.map((src, index) => {
+                      <AudioMP3 handleMediaNum={handleMediaNum} key={index} index={index} src={src} autoPlay={index == mediaNum} />
+                    })
+                  }
+                </>
           }
         </div>
         <div className='flex justify-end gap-2 w-full mt-2'>
@@ -166,7 +202,7 @@ const ContentView = memo(
               {!useStore.getState().generating &&
                 role === 'assistant' &&
                 messageIndex === lastMessageIndex && (
-                  <RefreshButton onClick={() => handleRefresh(!isBase64)} />
+                  <RefreshButton onClick={() => handleRefresh(numFunction)} />
                 )}
               {/* {messageIndex !== 0 && <UpButton onClick={handleMoveUp} />}
               {messageIndex !== lastMessageIndex && (

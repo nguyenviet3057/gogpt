@@ -9,15 +9,17 @@ import { ChatInterface } from '@type/chat';
 import PopupModal from '@components/PopupModal';
 import TokenCount from '@components/TokenCount';
 import CommandPrompt from '../CommandPrompt';
+import { load } from 'react-cookies';
+import { AppConfig } from '@constants/config';
 
 const EditView = ({
-  isText,
+  numFunction,
   content,
   setIsEdit,
   messageIndex,
   sticky,
 }: {
-  isText: boolean;
+  numFunction: Number;
   content: string;
   setIsEdit: React.Dispatch<React.SetStateAction<boolean>>;
   messageIndex: number;
@@ -91,6 +93,32 @@ const EditView = ({
     if (sticky) {
       if (_content !== '') {
         updatedMessages.push({ role: inputRole, content: _content });
+        var myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
+
+        let currentChat: ChatInterface = updatedChats[currentChatIndex];
+
+        var urlencoded = new URLSearchParams();
+        urlencoded.append("Authorization", `Bearer ${load("access_token")}`);
+        urlencoded.append("id", currentChat.id);
+        urlencoded.append("config", JSON.stringify(currentChat.config));
+        urlencoded.append("title", JSON.stringify(currentChat.title));
+        urlencoded.append("titleSet", currentChat.titleSet ? "1" : "0");
+        urlencoded.append("chat_id", currentChat.id);
+        urlencoded.append("role", inputRole);
+        urlencoded.append("content", _content);
+        var requestOptions = {
+          method: 'POST',
+          headers: myHeaders,
+          body: urlencoded
+        };
+        fetch(AppConfig.BASE_URL + AppConfig.CHAT_CREATE, requestOptions)
+          .then(response => {
+            return response.status;
+          })
+          .catch(error => {
+            console.error('Error:', error);
+          })
       }
       _setContent('');
       resetTextAreaHeight();
@@ -103,7 +131,7 @@ const EditView = ({
       setIsEdit(false);
     }
     setChats(updatedChats);
-    handleSubmit(isText);
+    handleSubmit(numFunction);
   };
 
   useEffect(() => {
@@ -123,11 +151,10 @@ const EditView = ({
   return (
     <>
       <div
-        className={`w-full ${
-          sticky
+        className={`w-full ${sticky
             ? 'py-2 md:py-3 px-2 md:px-4 border border-black/10 bg-white dark:border-gray-900/50 dark:text-white dark:bg-gray-700 rounded-md shadow-[0_0_10px_rgba(0,0,0,0.10)] dark:shadow-[0_0_15px_rgba(0,0,0,0.10)]'
             : ''
-        }`}
+          }`}
       >
         <textarea
           ref={textareaRef}
@@ -186,13 +213,12 @@ const EditViewButtons = memo(
         <div className='flex-1 text-center mt-2 flex justify-center'>
           {sticky && (
             <button
-              className={`btn relative mr-2 btn-primary ${
-                generating ? 'cursor-not-allowed opacity-40' : ''
-              }`}
+              className={`btn relative mr-2 btn-primary ${generating ? 'cursor-not-allowed opacity-40' : ''
+                }`}
               onClick={handleSaveAndSubmit}
             >
               <div className='flex items-center justify-center gap-2'>
-                {t('saveAndSubmit')}
+                {t('Submit')}
               </div>
             </button>
           )}

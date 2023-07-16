@@ -6,17 +6,17 @@ import MobileBar from '../MobileBar';
 import StopGeneratingButton from '@components/StopGeneratingButton/StopGeneratingButton';
 
 import { TbTextSize } from 'react-icons/tb';
-import { BsImage } from 'react-icons/bs'
+import { BsImage, BsMusicNoteList } from 'react-icons/bs'
 
 import './chat.css';
 
 const Chat = () => {
   const hideSideMenu = useStore((state) => state.hideSideMenu);
 
-  const [isText, setIsText] = useState(true);
+  const [numFunction, setNumFunction] = useState(0);
 
-  const useTextBot = (bool: boolean) => {
-    setIsText(bool);
+  const handleFunction = (num: any) => {
+    setNumFunction(num);
   }
 
   return (
@@ -27,15 +27,18 @@ const Chat = () => {
     >
       <MobileBar />
       <main className='relative h-full w-full transition-width flex flex-col overflow-hidden items-stretch flex-1'>
-        <ChatContent isText={isText} />
+        <ChatContent numFunction={numFunction} />
         <StopGeneratingButton />
       </main>
       <div className='ai-type-overlay'>
-        <div className={isText ? 'active' : ''} onClick={() => useTextBot(true)}>
+        <div className={numFunction == 0 ? 'active' : ''} onClick={() => handleFunction(0)}>
           <TbTextSize />
         </div>
-        <div className={isText ? '' : 'active'} onClick={() => useTextBot(false)}>
+        <div className={numFunction == 1 ? 'active' : ''} onClick={() => handleFunction(1)}>
           <BsImage />
+        </div>
+        <div className={numFunction == 2 ? 'active' : ''} onClick={() => handleFunction(2)}>
+          <BsMusicNoteList />
         </div>
       </div>
     </div>

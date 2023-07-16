@@ -3,23 +3,18 @@
     top: 30px;
     right: 0px;
     padding: 20px;
-    opacity: 0.6;
-}
-
-.ai-type-overlay:hover {
-    opacity: 1;
 }
 
 .ai-type-overlay > div {
     padding: 15px;
-    background-color: white;
+    background-color: darkgray;
     margin: 20px;
     border-radius: 0.375rem;
     cursor: pointer;
 }
 
 .ai-type-overlay > div:hover {
-    background-color: lightgray;
+    background-color: gray;
 }
 
 .ai-type-overlay > div.active {

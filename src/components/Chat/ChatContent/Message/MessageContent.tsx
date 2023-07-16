@@ -5,13 +5,13 @@ import ContentView from './View/ContentView';
 import EditView from './View/EditView';
 
 const MessageContent = ({
-  isText,
+  numFunction,
   role,
   content,
   messageIndex,
   sticky = false,
 }: {
-  isText: boolean;
+  numFunction: Number;
   role: string;
   content: string;
   messageIndex: number;
@@ -25,7 +25,7 @@ const MessageContent = ({
       {advancedMode && <div className='flex flex-grow flex-col gap-3'></div>}
       {isEdit ? (
         <EditView
-          isText={isText}
+          numFunction={numFunction}
           content={content}
           setIsEdit={setIsEdit}
           messageIndex={messageIndex}

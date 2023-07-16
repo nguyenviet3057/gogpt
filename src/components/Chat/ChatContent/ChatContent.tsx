@@ -17,7 +17,7 @@ const ChatContent = (props: any) => {
   const inputRole = useStore((state) => state.inputRole);
   const setError = useStore((state) => state.setError);
   
-  const { isText } = props;
+  const { numFunction } = props;
 
   const messages = useStore((state) =>
     state.chats &&
@@ -69,7 +69,7 @@ const ChatContent = (props: any) => {
             {messages?.map((message, index) => (
               <React.Fragment key={index}>
                 <Message
-                  isText={isText}
+                  numFunction={numFunction}
                   role={message.role}
                   content={message.content}
                   messageIndex={index}
@@ -80,7 +80,7 @@ const ChatContent = (props: any) => {
           </div>
 
           <Message
-            isText={isText}
+            numFunction={numFunction}
             role={inputRole}
             content=''
             messageIndex={stickyIndex}
