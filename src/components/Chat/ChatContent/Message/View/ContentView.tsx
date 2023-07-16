@@ -54,6 +54,7 @@ const ContentView = memo(
     const [numFunction, setNumFunction] = useState(0);
     const [imageSrc, setImageSrc] = useState("");
     const [mediaSrc, setMediaSrc] = useState([]);
+    const [mediaNum, setMediaNum] = useState(0);
 
     useEffect(() => {
       try {
@@ -71,7 +72,8 @@ const ContentView = memo(
       } catch (e: any) {
         // console.log(content);
       }
-    }, [numFunction])
+      console.log(mediaNum);
+    }, [numFunction, mediaNum]);
 
     const currentChatIndex = useStore((state) => state.currentChatIndex);
     const setChats = useStore((state) => state.setChats);
@@ -127,6 +129,11 @@ const ContentView = memo(
       navigator.clipboard.writeText(content);
     };
 
+    const handleMediaNum = (num: any) => {
+      console.log(num);
+      setMediaNum(num);
+    }
+
     return (
       <>
         <div className='markdown prose w-full md:max-w-full break-words dark:prose-invert dark share-gpt-message'>
@@ -166,7 +173,7 @@ const ContentView = memo(
                   {
                     mediaSrc.map((src, index) => (
                       <>
-                        <AudioMP3 key={index} src={src} autoPlay={index == 0} />
+                        <AudioMP3 handleMediaNum={handleMediaNum} key={index} index={index} src={src} autoPlay={index == mediaNum} />
                       </>
                     ))
                   }
@@ -182,8 +189,8 @@ const ContentView = memo(
                 :
                 <>
                   {
-                    mediaSrc.forEach((src, index) => {
-                      <AudioMP3 key={index} src={src} autoPlay={index == 0} />
+                    mediaSrc.map((src, index) => {
+                      <AudioMP3 handleMediaNum={handleMediaNum} key={index} index={index} src={src} autoPlay={index == mediaNum} />
                     })
                   }
                 </>

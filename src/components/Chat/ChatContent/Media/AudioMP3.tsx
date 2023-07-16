@@ -3,20 +3,27 @@ import ReactAudioPlayer from 'react-audio-player';
 
 function AudioMP3(props: any) {
 
-    const { src, autoPlay } = props;
+    const { src, autoPlay, index, handleMediaNum } = props;
+
+    const handleEnded = () => {
+        console.log(index);
+        handleMediaNum(index + 1);
+    }
 
     return (
         <>
-            {/* <audio
+            <ReactAudioPlayer
                 src={src}
                 autoPlay={autoPlay}
+                preload={autoPlay ? 'metadata' : 'none'}
                 controls
-            /> */}
-            <audio autoPlay={autoPlay} controls>
+                onEnded={handleEnded}
+            />
+            {/* <audio autoPlay={autoPlay} controls preload={autoPlay ? 'metadata' : 'none'}>
                 <source src={src} type="audio/ogg" />
                 <source src={src} type="audio/mpeg" />
                 Your browser does not support the audio element.
-            </audio>
+            </audio> */}
         </>
     )
 }
