@@ -67,7 +67,7 @@ const ContentView = memo(
           setNumFunction(2);
           setMediaSrc(data.media_links);
         }
-        // console.log(imageSrc);
+        console.log(numFunction);
       } catch (e: any) {
         // console.log(content);
       }
