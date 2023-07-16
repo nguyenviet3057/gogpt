@@ -12,18 +12,18 @@ function AudioMP3(props: any) {
 
     return (
         <>
-            <ReactAudioPlayer
+            {/* <ReactAudioPlayer
                 src={src}
                 autoPlay={autoPlay}
                 preload={autoPlay ? 'metadata' : 'none'}
                 controls
                 onEnded={handleEnded}
-            />
-            {/* <audio autoPlay={autoPlay} controls preload={autoPlay ? 'metadata' : 'none'}>
+            /> */}
+            <audio autoPlay={autoPlay} controls preload={autoPlay ? 'metadata' : 'none'} onEnded={handleEnded}>
                 <source src={src} type="audio/ogg" />
                 <source src={src} type="audio/mpeg" />
                 Your browser does not support the audio element.
-            </audio> */}
+            </audio>
         </>
     )
 }
