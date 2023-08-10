@@ -52,7 +52,13 @@
   "queueTotal": "tổng số",
   "finishing": "Đang hoàn tất...",
   
+  "accountNotFound": "Tài khoản không tồn tại",
   "logout": "Đăng xuất",
+  "emailConfirmation": "Chúng tôi vừa gửi bạn đường dẫn xác nhận.\nHãy kiểm tra hộp thư email và đóng cửa sổ này !",
+  "invalidConfirmCode": "Sai mã xác nhận",
+  "emailExists": "Email đã được kích hoạt",
+  "verifyingEmail": "Đang xác nhận Email",
+  "loading": "Đang tải",
   "alert": "Nhắc nhở",
   "outOfTokens": "Bạn đã dùng hết lượt ngày hôm nay",
 

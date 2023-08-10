@@ -52,7 +52,13 @@
   "queueTotal": "total",
   "finishing": "Completing...",
 
+  "accountNotFound": "Account not found",
   "logout": "Logout",
+  "emailConfirmation": "We have sent you a confirmation link.\nPlease check your email and close this tab !",
+  "invalidConfirmCode": "Invalid confirmation code",
+  "emailExists": "Email is already activated",
+  "verifyingEmail": "Verifying Email",
+  "loading": "Loading",
   "alert": "Alert",
   "outOfTokens": "You have used all of your daily tokens",
 

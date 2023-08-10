@@ -17,8 +17,10 @@ import { default as Auth } from '@components/Auth/login';
 import { AppConfig } from '@constants/config';
 import PuffLoader from "react-spinners/PuffLoader";
 import { TypeAnimation } from 'react-type-animation';
+import { useTranslation } from 'react-i18next';
 
 function App() {
+  const { t } = useTranslation();
   const initialiseNewChat = useInitialiseNewChat();
   const setChats = useStore((state) => state.setChats);
   const setTheme = useStore((state) => state.setTheme);
@@ -54,8 +56,12 @@ function App() {
         })
         .then(result => {
           // console.log('Response:', result);
-          save("access_token", result.token, {});
-          window.location.href = window.location.origin + window.location.pathname;
+          if (result.status == 1) {
+            save("access_token", result.token, {});
+            window.location.href = window.location.origin + window.location.pathname;
+          }
+          if (result.status == -1) alert(t("invalidConfirmCode"));
+          if (result.status == 0) alert(t("emailExists"));
         })
         .catch(error => {
           console.error('Error:', error);
@@ -64,10 +70,6 @@ function App() {
   }
 
   useEffect(() => {
-    document.documentElement.lang = i18n.language;
-    i18n.on('languageChanged', (lng) => {
-      document.documentElement.lang = lng;
-    });
     if (queryParams.has('code')) {
       console.log(hasCode);
       setHasCode(true);
@@ -100,6 +102,13 @@ function App() {
         });
     }
   }, [hasCode]);
+
+  useEffect(() => {
+    document.documentElement.lang = i18n.language;
+    i18n.on('languageChanged', (lng) => {
+      document.documentElement.lang = lng;
+    });
+  }, []);
 
   useEffect(() => {
     const getChats = async () => {
@@ -181,14 +190,13 @@ function App() {
     <div className='loading-process flex flex-column w-full h-full align-items-center justify-content-center' style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', backgroundColor: '#444654', color: 'white' }}>
       <TypeAnimation
         sequence={[
-          // Same substring at the start will only be typed out once, initially
-          'Loading',
-          800, // wait 1s before replacing "Mice" with "Hamsters"
-          'Loading.',
+          t('loading') as string,
           800,
-          'Loading..',
+          t('loading') + '.',
           800,
-          'Loading...',
+          t('loading') + '..',
+          800,
+          t('loading') + '...',
           800
         ]}
         wrapper="span"
@@ -209,14 +217,13 @@ function App() {
         <div className='confirm-process flex flex-column w-full h-full align-items-center justify-content-center' style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', backgroundColor: '#444654', color: 'white' }}>
           <TypeAnimation
             sequence={[
-              // Same substring at the start will only be typed out once, initially
-              'Verifying Email',
-              800, // wait 1s before replacing "Mice" with "Hamsters"
-              'Verifying Email.',
+              t('verifyingEmail') as string,
               800,
-              'Verifying Email..',
+              t('verifyingEmail') + '.',
               800,
-              'Verifying Email...',
+              t('verifyingEmail') + '..',
+              800,
+              t('verifyingEmail') + '...',
               800
             ]}
             wrapper="span"
