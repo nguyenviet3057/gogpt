@@ -15,8 +15,8 @@ const LanguageSelector = () => {
         type='button'
         onClick={() => setDropDown((prev) => !prev)}
       >
-        {languageCodeToName[i18n.language as keyof typeof languageCodeToName] ??
-          i18n.language}
+        {/* {languageCodeToName[i18n.language as keyof typeof languageCodeToName] ?? i18n.language} */}
+        {languageCodeToName[i18n.language as keyof typeof languageCodeToName] ?? languageCodeToName['en-US']}
         <DownChevronArrow />
       </button>
       <div

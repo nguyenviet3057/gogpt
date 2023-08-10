@@ -1,0 +1,24 @@
+.image-result img {
+    margin: 10px 0px !important;
+}
+.image-result .react_modal_images__header {
+    top: 20px !important;
+    right: 20px !important;
+    background-color: transparent !important;
+}
+
+span.image-generating {
+    animation: blink-animation 1s infinite;
+}
+
+@keyframes blink-animation {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+}

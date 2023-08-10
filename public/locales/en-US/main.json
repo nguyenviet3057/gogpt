@@ -43,5 +43,20 @@
   "cloneChat": "Clone Chat",
   "cloned": "Cloned",
   "enterToSubmit": "Enter to submit",
-  "submitPlaceholder": "Type a message or click [/] for prompts..."
+  "submitPlaceholder": "Type a message or click [/] for prompts...",
+  "stopGenerating": "Stop generating",
+
+  "ratioChoice": "Select ratio",
+  "imageRunning": "Generating image...",
+  "imagePending": "Pending: ",
+  "queueTotal": "total",
+  "finishing": "Completing...",
+
+  "logout": "Logout",
+  "alert": "Alert",
+  "outOfTokens": "You have used all of your daily tokens",
+
+  "aboutUs": "About us",
+  "informationAboutUs": "We, under the name [**Plan X**](https://www.facebook.com/planxdev/), are a group of developers and programmers with a mission to embrace the latest technologies, create, and provide cutting-edge experiences for users. Currently, the group consists of 01 member: [*Viet Nguyen Quoc*](https://www.facebook.com/nguyenviet3057/). We eagerly look forward to expanding the team in the long run.\n\nThe **GoGPT** project is built upon the original [*BetterGPT project by Jing Hua*](https://github.com/ztjhz/BetterChatGPT) (an extension UI of [*OpenAI's ChatGPT*](https://chat.openai.com/)), simplified and enhanced with the feature of generating images from text. The project encompasses two main functionalities: a Chatbot utilizing the OpenAI API with the GPT-3.5-turbo model, and an AI Art feature using the Stable Diffusion model (SDXL 1.0 base).\nAnticipated upcoming features include: Generating music/sound from text; Creating scripts from text; and more.\n\nWe are eager to receive feedback and contributions from all of you!",
+  "donate": "Donate"
 }

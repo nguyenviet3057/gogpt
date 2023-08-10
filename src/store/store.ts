@@ -26,13 +26,15 @@ import {
   migrateV6,
   migrateV7,
 } from './migrate';
+import { CustomSlice, createCustomSlice } from './custom-slice';
 
 export type StoreState = ChatSlice &
   InputSlice &
   AuthSlice &
   ConfigSlice &
   PromptSlice &
-  ToastSlice;
+  ToastSlice &
+  CustomSlice;
 
 export type StoreSlice<T> = (
   set: StoreApi<StoreState>['setState'],
@@ -59,6 +61,7 @@ export const createPartializedState = (state: StoreState) => ({
   markdownMode: state.markdownMode,
   totalTokenUsed: state.totalTokenUsed,
   countTotalTokens: state.countTotalTokens,
+  lastToken: state.lastToken,
 });
 
 const useStore = create<StoreState>()(
@@ -70,6 +73,7 @@ const useStore = create<StoreState>()(
       ...createConfigSlice(set, get),
       ...createPromptSlice(set, get),
       ...createToastSlice(set, get),
+      ...createCustomSlice(set, get),
     }),
     {
       name: 'free-chat-gpt',

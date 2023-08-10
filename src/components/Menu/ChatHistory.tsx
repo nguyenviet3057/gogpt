@@ -8,6 +8,9 @@ import DeleteIcon from '@icon/DeleteIcon';
 import EditIcon from '@icon/EditIcon';
 import TickIcon from '@icon/TickIcon';
 import useStore from '@store/store';
+import { AppConfig } from '@constants/config';
+import { load } from 'react-cookies';
+import { ChatInterface } from '@type/chat';
 
 const ChatHistoryClass = {
   normal:
@@ -34,26 +37,81 @@ const ChatHistory = React.memo(
     const inputRef = useRef<HTMLInputElement>(null);
 
     const editTitle = () => {
-      const updatedChats = JSON.parse(
+      const updatedChats: Array<ChatInterface> = JSON.parse(
         JSON.stringify(useStore.getState().chats)
       );
       updatedChats[chatIndex].title = _title;
+      updatedChats[chatIndex].titleSet = true;
+
+      var myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
+
+      var urlencoded = new URLSearchParams();
+      urlencoded.append("Authorization", `Bearer ${load("access_token")}`);
+      urlencoded.append("id", updatedChats[chatIndex].id);
+      urlencoded.append("config", JSON.stringify(updatedChats[chatIndex].config));
+      urlencoded.append("title", updatedChats[chatIndex].title);
+      urlencoded.append("titleSet", updatedChats[chatIndex].titleSet ? "1" : "0");
+      if (updatedChats[chatIndex].folder) urlencoded.append("folder_id", updatedChats[chatIndex].folder!);
+
+      var requestOptions = {
+        method: 'POST',
+        headers: myHeaders,
+        body: urlencoded
+      };
+
+      fetch(AppConfig.BASE_URL + AppConfig.CHAT_UPDATE, requestOptions)
+        .then(response => {
+          // console.log(response);
+          return response.json()
+        })
+        .then(result => {
+          // console.log(result);
+        })
+        .catch(error => {
+          console.error('Error:', error);
+        });
       setChats(updatedChats);
       setIsEdit(false);
     };
 
     const deleteChat = () => {
-      const updatedChats = JSON.parse(
+      const updatedChats: Array<ChatInterface> = JSON.parse(
         JSON.stringify(useStore.getState().chats)
       );
-      updatedChats.splice(chatIndex, 1);
-      if (updatedChats.length > 0) {
-        setCurrentChatIndex(0);
-        setChats(updatedChats);
-      } else {
-        initialiseNewChat();
-      }
-      setIsDelete(false);
+
+      var myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
+
+      var urlencoded = new URLSearchParams();
+      urlencoded.append("Authorization", `Bearer ${load("access_token")}`);
+      urlencoded.append("id", updatedChats[chatIndex].id);
+
+      var requestOptions = {
+        method: 'POST',
+        headers: myHeaders,
+        body: urlencoded
+      };
+
+      fetch(AppConfig.BASE_URL + AppConfig.CHAT_DELETE, requestOptions)
+        .then(response => {
+          // console.log(response);
+          return response.json()
+        })
+        .then(result => {
+          // console.log(result);
+          updatedChats.splice(chatIndex, 1);
+          if (updatedChats.length > 0) {
+            setCurrentChatIndex(0);
+            setChats(updatedChats);
+          } else {
+            initialiseNewChat();
+          }
+          setIsDelete(false);
+        })
+        .catch(error => {
+          console.error('Error:', error);
+        });
     };
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -85,17 +143,43 @@ const ChatHistory = React.memo(
       if (inputRef && inputRef.current) inputRef.current.focus();
     }, [isEdit]);
 
+    const updateCurrentChatIndex = (chatIndex: number) => {
+      var myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
+
+      var urlencoded = new URLSearchParams();
+      urlencoded.append("Authorization", `Bearer ${load("access_token")}`);
+      urlencoded.append("chat_index", String(chatIndex));
+
+      var requestOptions = {
+        method: 'POST',
+        headers: myHeaders,
+        body: urlencoded
+      };
+
+      fetch(AppConfig.BASE_URL + AppConfig.CHAT_INDEX, requestOptions)
+        .then(response => {
+          // console.log(response);
+          return response.json()
+        })
+        .then(result => {
+          // console.log(result);
+        })
+        .catch(error => {
+          console.error('Error:', error);
+        });
+      setCurrentChatIndex(chatIndex);
+    }
+
     return (
       <a
-        className={`${
-          active ? ChatHistoryClass.active : ChatHistoryClass.normal
-        } ${
-          generating
+        className={`${active ? ChatHistoryClass.active : ChatHistoryClass.normal
+          } ${generating
             ? 'cursor-not-allowed opacity-40'
             : 'cursor-pointer opacity-100'
-        }`}
+          }`}
         onClick={() => {
-          if (!generating) setCurrentChatIndex(chatIndex);
+          if (!generating) updateCurrentChatIndex(chatIndex)
         }}
         draggable
         onDragStart={handleDragStart}

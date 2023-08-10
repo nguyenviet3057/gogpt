@@ -21,7 +21,7 @@ const ClearConversation = () => {
 
   return (
     <>
-      <button className='btn btn-neutral'
+      <button className='btn btn-neutral gap-1'
         onClick={() => {
           setIsModalOpen(true);
         }}

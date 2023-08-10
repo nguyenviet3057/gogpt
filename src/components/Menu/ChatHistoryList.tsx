@@ -12,6 +12,8 @@ import {
   ChatInterface,
   FolderCollection,
 } from '@type/chat';
+import { AppConfig } from '@constants/config';
+import { load } from 'react-cookies';
 
 const ChatHistoryList = () => {
   const currentChatIndex = useStore((state) => state.currentChatIndex);
@@ -136,6 +138,34 @@ const ChatHistoryList = () => {
         JSON.stringify(useStore.getState().chats)
       );
       delete updatedChats[chatIndex].folder;
+
+      var myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
+
+      var urlencoded = new URLSearchParams();
+      urlencoded.append("Authorization", `Bearer ${load("access_token")}`);
+      urlencoded.append("id", updatedChats[chatIndex].id);
+      urlencoded.append("config", JSON.stringify(updatedChats[chatIndex].config));
+      urlencoded.append("title", updatedChats[chatIndex].title);
+      urlencoded.append("titleSet", updatedChats[chatIndex].titleSet ? "1" : "0");
+
+      var requestOptions = {
+        method: 'POST',
+        headers: myHeaders,
+        body: urlencoded
+      };
+
+      fetch(AppConfig.BASE_URL + AppConfig.CHAT_UPDATE, requestOptions)
+        .then(response => {
+          // console.log(response);
+          return response.json()
+        })
+        .then(result => {
+          // console.log(result);
+        })
+        .catch(error => {
+          console.error('Error:', error);
+        });
       setChats(updatedChats);
     }
   };
@@ -155,9 +185,8 @@ const ChatHistoryList = () => {
 
   return (
     <div
-      className={`flex-col flex-1 overflow-y-auto hide-scroll-bar border-b border-white/20 ${
-        isHover ? 'bg-gray-800/40' : ''
-      }`}
+      className={`flex-col flex-1 overflow-y-auto hide-scroll-bar border-b border-white/20 ${isHover ? 'bg-gray-800/40' : ''
+        }`}
       onDrop={handleDrop}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}

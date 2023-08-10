@@ -1,21 +1,30 @@
 .ai-type-overlay {
     position: absolute;
-    top: 30px;
-    right: 0px;
-    padding: 20px;
+    top: 1rem;
+    right: 1rem;
+    padding: 1.25rem;
 }
 
 .ai-type-overlay > div {
-    padding: 15px;
-    background-color: darkgray;
-    margin: 20px;
+    padding: 1rem;
+    margin: 1.25rem;
+    background-color: lightgray;
+    color: gray;
     border-radius: 0.375rem;
     cursor: pointer;
 }
 
 .ai-type-overlay > div:hover {
-    background-color: gray;
+    background-color: black;
+    color: white;
 }
+
+/* .ai-type-overlay > div.active {
+    background-color: #202123;
+    color: white;
+    box-shadow: gray 0px 0px 9px 0px;
+    cursor: auto;
+} */
 
 .ai-type-overlay > div.active {
     background-color: #202123;

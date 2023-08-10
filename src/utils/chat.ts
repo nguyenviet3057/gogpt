@@ -8,7 +8,7 @@ export const htmlToImg = async (html: HTMLDivElement) => {
   if (needResize) {
     html.style.width = '1023px';
   }
-  const canvas = await html2canvas(html);
+  const canvas = await html2canvas(html, { allowTaint: true, useCORS: true });
   if (needResize) html.style.width = initialWidth;
   const dataURL = canvas.toDataURL('image/png');
   return dataURL;

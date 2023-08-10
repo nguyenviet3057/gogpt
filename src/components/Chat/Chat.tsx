@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import useStore from '@store/store';
 
 import ChatContent from './ChatContent';
@@ -12,11 +12,11 @@ import './chat.css';
 
 const Chat = () => {
   const hideSideMenu = useStore((state) => state.hideSideMenu);
-
-  const [numFunction, setNumFunction] = useState(0);
+  const typeAI = useStore((state) => state.typeAI);
+  const setTypeAI = useStore((state) => state.setTypeAI);
 
   const handleFunction = (num: any) => {
-    setNumFunction(num);
+    setTypeAI(num);
   }
 
   return (
@@ -27,19 +27,19 @@ const Chat = () => {
     >
       <MobileBar />
       <main className='relative h-full w-full transition-width flex flex-col overflow-hidden items-stretch flex-1'>
-        <ChatContent numFunction={numFunction} />
+        <ChatContent />
         <StopGeneratingButton />
       </main>
       <div className='ai-type-overlay'>
-        <div className={numFunction == 0 ? 'active' : ''} onClick={() => handleFunction(0)}>
+        <div className={typeAI == 0 ? 'active' : ''} onClick={() => handleFunction(0)}>
           <TbTextSize />
         </div>
-        <div className={numFunction == 1 ? 'active' : ''} onClick={() => handleFunction(1)}>
+        <div className={typeAI == 1 ? 'active' : ''} onClick={() => handleFunction(1)}>
           <BsImage />
         </div>
-        <div className={numFunction == 2 ? 'active' : ''} onClick={() => handleFunction(2)}>
+        {/* <div className={typeAI == 2 ? 'active' : ''} onClick={() => handleFunction(2)}>
           <BsMusicNoteList />
-        </div>
+        </div> */}
       </div>
     </div>
   );

@@ -3,9 +3,11 @@ import LogoutIcon from '@icon/LogoutIcon';
 import { load } from 'react-cookies';
 
 import { AppConfig } from '@constants/config';
+import { useTranslation } from 'react-i18next';
 
 const Logout = (props: any) => {
   const { setIsLogged } = props;
+  const { t } = useTranslation();
 
   const handleLogout = () => {
     var myHeaders = new Headers();
@@ -33,7 +35,7 @@ const Logout = (props: any) => {
   return (
     <a onClick={handleLogout} className='flex py-2 px-2 items-center gap-3 rounded-md hover:bg-gray-500/10 transition-colors duration-200 text-white cursor-pointer text-sm'>
       <LogoutIcon />
-      Log out
+      {t('logout')}
     </a>
   );
 };

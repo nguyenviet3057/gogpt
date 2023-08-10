@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import ScrollToBottom from 'react-scroll-to-bottom';
 import useStore from '@store/store';
 
@@ -16,28 +16,28 @@ import ShareGPT from '@components/ShareGPT';
 const ChatContent = (props: any) => {
   const inputRole = useStore((state) => state.inputRole);
   const setError = useStore((state) => state.setError);
-  
-  const { numFunction } = props;
 
   const messages = useStore((state) =>
     state.chats &&
-    state.chats.length > 0 &&
-    state.currentChatIndex >= 0 &&
-    state.currentChatIndex < state.chats.length
+      state.chats.length > 0 &&
+      state.currentChatIndex >= 0 &&
+      state.currentChatIndex < state.chats.length
       ? state.chats[state.currentChatIndex].messages
       : []
   );
   const stickyIndex = useStore((state) =>
     state.chats &&
-    state.chats.length > 0 &&
-    state.currentChatIndex >= 0 &&
-    state.currentChatIndex < state.chats.length
+      state.chats.length > 0 &&
+      state.currentChatIndex >= 0 &&
+      state.currentChatIndex < state.chats.length
       ? state.chats[state.currentChatIndex].messages.length
       : 0
   );
   const advancedMode = useStore((state) => state.advancedMode);
   const generating = useStore.getState().generating;
   const hideSideMenu = useStore((state) => state.hideSideMenu);
+  const [displayMessages, setDisplayMessages] = useState(messages);
+  const store = useStore();
 
   const saveRef = useRef<HTMLDivElement>(null);
 
@@ -47,6 +47,17 @@ const ChatContent = (props: any) => {
       setError('');
     }
   }, [generating]);
+
+  useEffect(() => {
+    const unsubscribe = useStore.subscribe(() => {
+      // console.log(displayMessages.at(-1)?.content)
+      setDisplayMessages(useStore.getState().chats? useStore.getState().chats![useStore.getState().currentChatIndex].messages : messages);
+    });
+
+    return () => {
+      unsubscribe();
+    }
+  }, [store]);
 
   const { error } = useSubmit();
 
@@ -66,10 +77,9 @@ const ChatContent = (props: any) => {
             {/* {!generating && advancedMode && messages?.length === 0 && (
               <NewMessageButton messageIndex={-1} />
             )} */}
-            {messages?.map((message, index) => (
+            {displayMessages?.map((message, index) => (
               <React.Fragment key={index}>
                 <Message
-                  numFunction={numFunction}
                   role={message.role}
                   content={message.content}
                   messageIndex={index}
@@ -78,9 +88,7 @@ const ChatContent = (props: any) => {
               </React.Fragment>
             ))}
           </div>
-
           <Message
-            numFunction={numFunction}
             role={inputRole}
             content=''
             messageIndex={stickyIndex}
@@ -102,17 +110,16 @@ const ChatContent = (props: any) => {
             </div>
           )}
           <div
-            className={`mt-4 w-full m-auto  ${
-              hideSideMenu
+            className={`mt-4 w-full m-auto  ${hideSideMenu
                 ? 'md:max-w-5xl lg:max-w-5xl xl:max-w-6xl'
                 : 'md:max-w-3xl lg:max-w-3xl xl:max-w-4xl'
-            }`}
+              }`}
           >
             {useStore.getState().generating || (
-              <div className='md:w-[calc(100%-50px)] flex gap-4 flex-wrap justify-center'>
+              <div className='md:w-[calc(100%-65px)] flex gap-4 flex-wrap justify-center'>
                 <DownloadChat saveRef={saveRef} />
                 {/* <ShareGPT /> */}
-                <CloneChat />
+                {/* <CloneChat /> */}
               </div>
             )}
           </div>

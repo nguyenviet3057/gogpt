@@ -5,6 +5,8 @@ import useStore from '@store/store';
 
 import NewFolderIcon from '@icon/NewFolderIcon';
 import { Folder, FolderCollection } from '@type/chat';
+import { AppConfig } from '@constants/config';
+import { load } from 'react-cookies';
 
 const NewFolder = () => {
   const { t } = useTranslation();
@@ -38,16 +40,42 @@ const NewFolder = () => {
       folder.order += 1;
     });
 
+    var myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
+
+    var urlencoded = new URLSearchParams();
+    urlencoded.append("Authorization", `Bearer ${load("access_token")}`);
+    urlencoded.append("id", newFolder.id);
+    urlencoded.append("name", newFolder.name);
+    urlencoded.append("expanded", newFolder.expanded ? "1" : "0");
+    urlencoded.append("order", String(newFolder.order));
+
+    var requestOptions = {
+      method: 'POST',
+      headers: myHeaders,
+      body: urlencoded
+    };
+
+    fetch(AppConfig.BASE_URL + AppConfig.FOLDER_CREATE, requestOptions)
+      .then(response => {
+        // console.log(response);
+        return response.json()
+      })
+      .then(result => {
+        // console.log(result);
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
     setFolders({ [id]: newFolder, ...updatedFolders });
   };
 
   return (
     <a
-      className={`flex py-3 px-3 items-center gap-3 rounded-md hover:bg-gray-500/10 transition-colors duration-200 text-white text-sm mb-2 flex-shrink-0 border border-white/20 transition-opacity ${
-        generating
-          ? 'cursor-not-allowed opacity-40'
-          : 'cursor-pointer opacity-100'
-      }`}
+      className={`flex py-3 px-3 items-center gap-3 rounded-md hover:bg-gray-500/10 transition-colors duration-200 text-white text-sm mb-2 flex-shrink-0 border border-white/20 transition-opacity ${generating
+        ? 'cursor-not-allowed opacity-40'
+        : 'cursor-pointer opacity-100'
+        }`}
       onClick={() => {
         if (!generating) addFolder();
       }}

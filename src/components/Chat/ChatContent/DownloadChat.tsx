@@ -36,7 +36,7 @@ const DownloadChat = React.memo(
             title={t('downloadChat') as string}
             cancelButton={false}
           >
-            <div className='p-6 border-b border-gray-200 dark:border-gray-600 flex gap-4'>
+            <div className='p-6 border-b border-gray-200 dark:border-gray-600 flex gap-4' style={{ justifyContent: 'center' }}>
               <button
                 className='btn btn-neutral gap-2'
                 onClick={async () => {
@@ -80,7 +80,7 @@ const DownloadChat = React.memo(
                 <PdfIcon />
                 PDF
               </button> */}
-              <button
+              {/* <button
                 className='btn btn-neutral gap-2'
                 onClick={async () => {
                   if (saveRef && saveRef.current) {
@@ -116,7 +116,7 @@ const DownloadChat = React.memo(
               >
                 <JsonIcon />
                 JSON
-              </button>
+              </button> */}
             </div>
           </PopupModal>
         )}

@@ -6,7 +6,7 @@ import Chat from '@components/Chat';
 import Menu from '@components/Menu';
 
 import useInitialiseNewChat from '@hooks/useInitialiseNewChat';
-import { ChatInterface } from '@type/chat';
+import { ChatInterface, Folder, FolderCollection } from '@type/chat';
 import { Theme } from '@type/theme';
 import ApiPopup from '@components/ApiPopup';
 import Toast from '@components/Toast';
@@ -24,11 +24,14 @@ function App() {
   const setTheme = useStore((state) => state.setTheme);
   const setApiKey = useStore((state) => state.setApiKey);
   const setCurrentChatIndex = useStore((state) => state.setCurrentChatIndex);
+  const setFolders = useStore((state) => state.setFolders);
+  const setLastToken = useStore((state) => state.setLastToken);
 
   const [isLogged, setIsLogged] = useState(false);
   const [checkedAuth, setCheckedAuth] = useState(false);
   const [hasCode, setHasCode] = useState(false);
   const queryParams = new URLSearchParams(window.location.search);
+  const [isLoading, setIsLoading] = useState(true);
 
   const verifyEmail = async () => {
     if (hasCode) {
@@ -114,41 +117,34 @@ function App() {
 
       await fetch(AppConfig.BASE_URL + AppConfig.CHAT_INFO, requestOptions)
         .then(response => {
-          // console.log(response);
           return response.json()
         })
         .then(result => {
-          // console.log(result);
-          oldChats = result;
+          let folders: Array<Folder> = result.folders;
+          const arrayToObject = (arr: Array<Folder>): FolderCollection => {
+            return arr.reduce((obj: FolderCollection, value: Folder) => {
+              value.expanded = Boolean(value.expanded);
+              obj[value.id] = value;
+              return obj;
+            }, {});
+          }
+          setFolders(arrayToObject(folders));
+
+          setLastToken(result.last_token ?? false);
+
+          oldChats = result.chats;
           if (oldChats) {
-            // legacy local storage
             try {
-              const chats: ChatInterface[] = JSON.parse(oldChats);
-              // console.log(chats);
+              const chats: ChatInterface[] = oldChats;
               if (chats.length > 0) {
                 setChats(chats);
-                setCurrentChatIndex(0);
+                setCurrentChatIndex(result.chat_index);
               } else {
                 initialiseNewChat();
               }
             } catch (e: unknown) {
               console.log(e);
-              initialiseNewChat();
-            }
-            // localStorage.removeItem('chats');
-          } else {
-            // existing local storage
-            const chats = useStore.getState().chats;
-            // console.log(chats);
-            const currentChatIndex = useStore.getState().currentChatIndex;
-            if (!chats || chats.length === 0) {
-              initialiseNewChat();
-            }
-            if (
-              chats &&
-              !(currentChatIndex >= 0 && currentChatIndex < chats.length)
-            ) {
-              setCurrentChatIndex(0);
+              // initialiseNewChat();
             }
           }
         })
@@ -162,61 +158,55 @@ function App() {
     // const oldChats = localStorage.getItem('chats');
     let oldChats: any;
     if (isLogged) {
-      getChats();
+      getChats().then(() => {
+        setIsLoading(false);
+      });
     }
     // const oldChats = JSON.stringify({});
     const apiKey = localStorage.getItem('apiKey');
     const theme = localStorage.getItem('theme');
 
     if (apiKey) {
-      // legacy local storage
       setApiKey(apiKey);
       localStorage.removeItem('apiKey');
     }
 
     if (theme) {
-      // legacy local storage
       setTheme(theme as Theme);
       localStorage.removeItem('theme');
     }
-
-    // if (oldChats) {
-    //   // legacy local storage
-    //   try {
-    //     const chats: ChatInterface[] = JSON.parse(oldChats);
-    //     console.log(chats);
-    //     if (chats.length > 0) {
-    //       setChats(chats);
-    //       setCurrentChatIndex(0);
-    //     } else {
-    //       initialiseNewChat();
-    //     }
-    //   } catch (e: unknown) {
-    //     console.log(e);
-    //     initialiseNewChat();
-    //   }
-    //   // localStorage.removeItem('chats');
-    // } else {
-    //   // existing local storage
-    //   const chats = useStore.getState().chats;
-    //   console.log(chats);
-    //   const currentChatIndex = useStore.getState().currentChatIndex;
-    //   if (!chats || chats.length === 0) {
-    //     initialiseNewChat();
-    //   }
-    //   if (
-    //     chats &&
-    //     !(currentChatIndex >= 0 && currentChatIndex < chats.length)
-    //   ) {
-    //     setCurrentChatIndex(0);
-    //   }
-    // }
   }, [isLogged]);
+
+  if (isLoading && isLogged) return (
+    <div className='loading-process flex flex-column w-full h-full align-items-center justify-content-center' style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', backgroundColor: '#444654', color: 'white' }}>
+      <TypeAnimation
+        sequence={[
+          // Same substring at the start will only be typed out once, initially
+          'Loading',
+          800, // wait 1s before replacing "Mice" with "Hamsters"
+          'Loading.',
+          800,
+          'Loading..',
+          800,
+          'Loading...',
+          800
+        ]}
+        wrapper="span"
+        speed={20}
+        style={{ marginBottom: '20px' }}
+        repeat={Infinity}
+        cursor={false}
+        deletionSpeed={{ type: 'keyStrokeDelayInMs', value: 0 }}
+        preRenderFirstString={true}
+      />
+      <PuffLoader color='teal' size={120} />
+    </div>
+  )
 
   return (
     <div className='overflow-hidden w-full h-full relative'>
       {hasCode ?
-        <div className='confirm-process flex flex-column w-full h-full align-items-center justify-content-center' style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+        <div className='confirm-process flex flex-column w-full h-full align-items-center justify-content-center' style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', backgroundColor: '#444654', color: 'white' }}>
           <TypeAnimation
             sequence={[
               // Same substring at the start will only be typed out once, initially

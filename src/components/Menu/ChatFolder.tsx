@@ -21,6 +21,8 @@ import RefreshIcon from '@icon/RefreshIcon';
 import { folderColorOptions } from '@constants/color';
 
 import useHideOnOutsideClick from '@hooks/useHideOnOutsideClick';
+import { load } from 'react-cookies';
+import { AppConfig } from '@constants/config';
 
 const ChatFolder = ({
   folderChats,
@@ -52,26 +54,84 @@ const ChatFolder = ({
       JSON.stringify(useStore.getState().folders)
     );
     updatedFolders[folderId].name = _folderName;
+
+    var myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
+
+    var urlencoded = new URLSearchParams();
+    urlencoded.append("Authorization", `Bearer ${load("access_token")}`);
+    urlencoded.append("id", updatedFolders[folderId].id);
+    urlencoded.append("name", updatedFolders[folderId].name);
+    urlencoded.append("expanded", updatedFolders[folderId].expanded ? "1" : "0");
+    urlencoded.append("order", String(updatedFolders[folderId].order));
+    if (updatedFolders[folderId].color) urlencoded.append("color", updatedFolders[folderId].color!);
+
+    var requestOptions = {
+      method: 'POST',
+      headers: myHeaders,
+      body: urlencoded
+    };
+
+    fetch(AppConfig.BASE_URL + AppConfig.FOLDER_UPDATE, requestOptions)
+      .then(response => {
+        // console.log(response);
+        return response.json()
+      })
+      .then(result => {
+        // console.log(result);
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+
     setFolders(updatedFolders);
     setIsEdit(false);
   };
 
   const deleteFolder = () => {
-    const updatedChats: ChatInterface[] = JSON.parse(
+    let updatedChats: ChatInterface[] = JSON.parse(
       JSON.stringify(useStore.getState().chats)
     );
-    updatedChats.forEach((chat) => {
-      if (chat.folder === folderId) delete chat.folder;
-    });
-    setChats(updatedChats);
+    // updatedChats.forEach((chat) => {
+    //   if (chat.folder === folderId) delete chat.folder;
+    // });
 
     const updatedFolders: FolderCollection = JSON.parse(
       JSON.stringify(useStore.getState().folders)
     );
-    delete updatedFolders[folderId];
-    setFolders(updatedFolders);
 
-    setIsDelete(false);
+    var myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
+
+    var urlencoded = new URLSearchParams();
+    urlencoded.append("Authorization", `Bearer ${load("access_token")}`);
+    urlencoded.append("id", updatedFolders[folderId].id);
+
+    var requestOptions = {
+      method: 'POST',
+      headers: myHeaders,
+      body: urlencoded
+    };
+
+    fetch(AppConfig.BASE_URL + AppConfig.FOLDER_DELETE, requestOptions)
+      .then(response => {
+        // console.log(response);
+        return response.json()
+      })
+      .then(result => {
+        // console.log(result);
+
+        updatedChats = updatedChats.filter(chat => chat.folder !== folderId)
+        setChats(updatedChats);
+
+        delete updatedFolders[folderId];
+        setFolders(updatedFolders);
+
+        setIsDelete(false);
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
   };
 
   const updateColor = (_color?: string) => {
@@ -80,6 +140,36 @@ const ChatFolder = ({
     );
     if (_color) updatedFolders[folderId].color = _color;
     else delete updatedFolders[folderId].color;
+
+    var myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
+
+    var urlencoded = new URLSearchParams();
+    urlencoded.append("Authorization", `Bearer ${load("access_token")}`);
+    urlencoded.append("id", updatedFolders[folderId].id);
+    urlencoded.append("name", updatedFolders[folderId].name);
+    urlencoded.append("expanded", updatedFolders[folderId].expanded ? "1" : "0");
+    urlencoded.append("order", String(updatedFolders[folderId].order));
+    if (updatedFolders[folderId].color) urlencoded.append("color", updatedFolders[folderId].color!);
+
+    var requestOptions = {
+      method: 'POST',
+      headers: myHeaders,
+      body: urlencoded
+    };
+
+    fetch(AppConfig.BASE_URL + AppConfig.FOLDER_UPDATE, requestOptions)
+      .then(response => {
+        // console.log(response);
+        return response.json()
+      })
+      .then(result => {
+        // console.log(result);
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+
     setFolders(updatedFolders);
     setShowPalette(false);
   };
@@ -113,6 +203,35 @@ const ChatFolder = ({
         JSON.stringify(useStore.getState().folders)
       );
       updatedFolders[folderId].expanded = true;
+
+      var myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
+
+      var urlencoded = new URLSearchParams();
+      urlencoded.append("Authorization", `Bearer ${load("access_token")}`);
+      urlencoded.append("id", updatedFolders[folderId].id);
+      urlencoded.append("name", updatedFolders[folderId].name);
+      urlencoded.append("expanded", updatedFolders[folderId].expanded ? "1" : "0");
+      urlencoded.append("order", String(updatedFolders[folderId].order));
+      if (updatedFolders[folderId].color) urlencoded.append("color", updatedFolders[folderId].color!);
+
+      var requestOptions = {
+        method: 'POST',
+        headers: myHeaders,
+        body: urlencoded
+      };
+
+      fetch(AppConfig.BASE_URL + AppConfig.FOLDER_UPDATE, requestOptions)
+        .then(response => {
+          // console.log(response);
+          return response.json()
+        })
+        .then(result => {
+          // console.log(result);
+        })
+        .catch(error => {
+          console.error('Error:', error);
+        });
       setFolders(updatedFolders);
 
       // update chat folderId to new folderId
@@ -121,6 +240,35 @@ const ChatFolder = ({
         JSON.stringify(useStore.getState().chats)
       );
       updatedChats[chatIndex].folder = folderId;
+
+      var myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
+
+      var urlencoded = new URLSearchParams();
+      urlencoded.append("Authorization", `Bearer ${load("access_token")}`);
+      urlencoded.append("id", updatedChats[chatIndex].id);
+      urlencoded.append("config", JSON.stringify(updatedChats[chatIndex].config));
+      urlencoded.append("title", updatedChats[chatIndex].title);
+      urlencoded.append("titleSet", updatedChats[chatIndex].titleSet ? "1" : "0");
+      if (updatedChats[chatIndex].folder) urlencoded.append("folder_id", updatedChats[chatIndex].folder!);
+
+      var requestOptions = {
+        method: 'POST',
+        headers: myHeaders,
+        body: urlencoded
+      };
+
+      fetch(AppConfig.BASE_URL + AppConfig.CHAT_UPDATE, requestOptions)
+        .then(response => {
+          // console.log(response);
+          return response.json()
+        })
+        .then(result => {
+          // console.log(result);
+        })
+        .catch(error => {
+          console.error('Error:', error);
+        });
       setChats(updatedChats);
     }
   };
@@ -140,6 +288,35 @@ const ChatFolder = ({
       JSON.stringify(useStore.getState().folders)
     );
     updatedFolders[folderId].expanded = !updatedFolders[folderId].expanded;
+
+    var myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
+
+    var urlencoded = new URLSearchParams();
+    urlencoded.append("Authorization", `Bearer ${load("access_token")}`);
+    urlencoded.append("id", updatedFolders[folderId].id);
+    urlencoded.append("name", updatedFolders[folderId].name);
+    urlencoded.append("expanded", updatedFolders[folderId].expanded ? "1" : "0");
+    urlencoded.append("order", String(updatedFolders[folderId].order));
+    if (updatedFolders[folderId].color) urlencoded.append("color", updatedFolders[folderId].color!);
+
+    var requestOptions = {
+      method: 'POST',
+      headers: myHeaders,
+      body: urlencoded
+    };
+
+    fetch(AppConfig.BASE_URL + AppConfig.FOLDER_UPDATE, requestOptions)
+      .then(response => {
+        // console.log(response);
+        return response.json()
+      })
+      .then(result => {
+        // console.log(result);
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
     setFolders(updatedFolders);
   };
 
@@ -149,18 +326,16 @@ const ChatFolder = ({
 
   return (
     <div
-      className={`w-full transition-colors group/folder ${
-        isHover ? 'bg-gray-800/40' : ''
-      }`}
+      className={`w-full transition-colors group/folder ${isHover ? 'bg-gray-800/40' : ''
+        }`}
       onDrop={handleDrop}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
     >
       <div
         style={{ background: color || '' }}
-        className={`${
-          color ? '' : 'hover:bg-gray-850'
-        } transition-colors flex py-2 pl-2 pr-1 items-center gap-3 relative rounded-md break-all cursor-pointer parent-sibling`}
+        className={`${color ? '' : 'hover:bg-gray-850'
+          } transition-colors flex py-2 pl-2 pr-1 items-center gap-3 relative rounded-md break-all cursor-pointer parent-sibling`}
         onClick={toggleExpanded}
         ref={folderRef}
         onMouseEnter={() => {
@@ -198,8 +373,7 @@ const ChatFolder = ({
               style={{
                 background:
                   color &&
-                  `linear-gradient(to left, ${
-                    color || 'var(--color-900)'
+                  `linear-gradient(to left, ${color || 'var(--color-900)'
                   }, rgb(32 33 35 / 0))`,
               }}
             />
@@ -271,9 +445,8 @@ const ChatFolder = ({
               </button>
               <button className='p-1 hover:text-white' onClick={toggleExpanded}>
                 <DownChevronArrow
-                  className={`${
-                    isExpanded ? 'rotate-180' : ''
-                  } transition-transform`}
+                  className={`${isExpanded ? 'rotate-180' : ''
+                    } transition-transform`}
                 />
               </button>
             </>

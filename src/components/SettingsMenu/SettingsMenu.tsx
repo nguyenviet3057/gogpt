@@ -48,14 +48,14 @@ const SettingsMenu = () => {
             <div className='flex flex-col gap-3'>
               <AutoTitleToggle />
               <EnterToSubmitToggle />
-              <InlineLatexToggle />
-              <AdvancedModeToggle />
-              <TotalTokenCostToggle />
+              {/* <InlineLatexToggle /> */}
+              {/* <AdvancedModeToggle /> */}
+              {/* <TotalTokenCostToggle /> */}
             </div>
             <ClearConversation />
-            <PromptLibraryMenu />
-            <ChatConfigMenu />
-            <TotalTokenCost />
+            {/* <PromptLibraryMenu /> */}
+            {/* <ChatConfigMenu /> */}
+            {/* <TotalTokenCost /> */}
           </div>
         </PopupModal>
       )}

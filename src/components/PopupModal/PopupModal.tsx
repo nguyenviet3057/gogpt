@@ -1,8 +1,16 @@
-import React from 'react';
+import React, { memo, DetailedHTMLProps, HTMLAttributes } from 'react';
+import { ReactMarkdownProps } from 'react-markdown/lib/ast-to-react';
 import ReactDOM from 'react-dom';
 import { useTranslation } from 'react-i18next';
 
 import CrossIcon2 from '@icon/CrossIcon2';
+import { ReactMarkdown } from 'react-markdown/lib/react-markdown';
+import { codeLanguageSubset } from '@constants/chat';
+import useStore from '@store/store';
+import rehypeKatex from 'rehype-katex';
+import rehypeHighlight from 'rehype-highlight';
+import remarkMath from 'remark-math';
+import remarkGfm from 'remark-gfm';
 
 const PopupModal = ({
   title = 'Information',
@@ -25,6 +33,8 @@ const PopupModal = ({
 }) => {
   const modalRoot = document.getElementById('modal-root');
   const { t } = useTranslation();
+  const inlineLatex = useStore((state) => state.inlineLatex);
+  const markdownMode = useStore((state) => state.markdownMode);
 
   const _handleClose = () => {
     handleClose && handleClose();
@@ -41,7 +51,7 @@ const PopupModal = ({
       <div className='fixed top-0 left-0 z-[999] w-full p-4 overflow-x-hidden overflow-y-auto h-full flex justify-center items-center'>
         <div className='relative z-2 max-w-2xl md:h-auto flex justify-center max-h-full'>
           <div className='relative bg-gray-50 rounded-lg shadow dark:bg-gray-700 max-h-full overflow-y-auto hide-scroll-bar'>
-            <div className='flex items-center justify-between p-4 border-b rounded-t dark:border-gray-600'>
+            <div className='flex items-center justify-between p-4 border-b rounded-t dark:border-gray-600 gap-2'>
               <h3 className='ml-2 text-lg font-semibold text-gray-900 dark:text-white'>
                 {title}
               </h3>
@@ -56,9 +66,32 @@ const PopupModal = ({
 
             {message && (
               <div className='p-6 border-b border-gray-200 dark:border-gray-600'>
-                <div className='min-w-fit text-gray-900 dark:text-gray-300 text-sm mt-4'>
+                {/* <div className='min-w-fit text-gray-900 dark:text-gray-300 text-sm mt-4'>
                   {message}
-                </div>
+                </div> */}
+                <ReactMarkdown
+                  remarkPlugins={[
+                    remarkGfm,
+                    [remarkMath, { singleDollarTextMath: inlineLatex }],
+                  ]}
+                  rehypePlugins={[
+                    rehypeKatex,
+                    [
+                      rehypeHighlight,
+                      {
+                        detect: true,
+                        ignoreMissing: true,
+                        subset: codeLanguageSubset,
+                      },
+                    ],
+                  ]}
+                  linkTarget='_new'
+                  components={{
+                    p,
+                  }}
+                >
+                  {message}
+                </ReactMarkdown>
               </div>
             )}
 
@@ -97,5 +130,20 @@ const PopupModal = ({
     return null;
   }
 };
+
+const p = memo(
+  (
+    props?: Omit<
+      DetailedHTMLProps<
+        HTMLAttributes<HTMLParagraphElement>,
+        HTMLParagraphElement
+      >,
+      'ref'
+    > &
+      ReactMarkdownProps
+  ) => {
+    return <p className='whitespace-pre-wrap min-w-fit text-gray-900 dark:text-gray-300 text-sm mt-4' style={{ textAlign: 'justify' }}>{props?.children}</p>;
+  }
+);
 
 export default PopupModal;

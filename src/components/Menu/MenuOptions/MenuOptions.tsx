@@ -27,8 +27,8 @@ const MenuOptions = (props: any) => {
           hideMenuOptions ? 'max-h-0' : 'max-h-full'
         } overflow-hidden transition-all`}
       >
-        {countTotalTokens && <TotalTokenCostDisplay />}
-        {googleClientId && <GoogleSync clientId={googleClientId} />}
+        {/* {countTotalTokens && <TotalTokenCostDisplay />} */}
+        {/* {googleClientId && <GoogleSync clientId={googleClientId} />} */}
         {/* <AboutMenu /> */}
         {/* <ImportExportChat /> */}
         {/* <Api /> */}
