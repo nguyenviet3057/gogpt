@@ -235,140 +235,112 @@ const useSubmit = () => {
             JSON.stringify(useStore.getState().chats)
           )[currentChatIndex];
 
-          var myHeaders = new Headers();
-          myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
+          const content = currentChat.messages.at(-2) ? currentChat.messages.at(-2)!.content : "";
 
-          var urlencoded = new URLSearchParams();
-          urlencoded.append("Authorization", `Bearer ${load("access_token")}`);
-          urlencoded.append("chat_id", currentChat.id);
-          urlencoded.append("role", currentChat.messages.at(-2) ? currentChat.messages.at(-2)!.role : "");
-          urlencoded.append("content", currentChat.messages.at(-2) ? currentChat.messages.at(-2)!.content : "");
-          urlencoded.append("ratio_x", ratioXY ? String(ratioXY[0]) : "1");
-          urlencoded.append("ratio_y", ratioXY ? String(ratioXY[1]) : "1");
-
-          var requestOptions = {
+          const url_detect = 'https://google-translate105.p.rapidapi.com/v1/rapid/detect';
+          const options_detect = {
             method: 'POST',
-            headers: myHeaders,
-            body: urlencoded
+            headers: {
+              'content-type': 'application/x-www-form-urlencoded',
+              'X-RapidAPI-Key': '03e3dedfe4mshb13f6210713b9c4p1c9f0ajsn48640a0b138c',
+              'X-RapidAPI-Host': 'google-translate105.p.rapidapi.com'
+            },
+            body: new URLSearchParams({
+              text: content
+            })
           };
 
-          await fetch(AppConfig.BASE_URL + AppConfig.TXT2IMG, requestOptions)
-            .then(response => {
-              // console.log(response);
-              return response.json()
-            })
-            .then(result => {
-              const updatedChats: ChatInterface[] = JSON.parse(
-                JSON.stringify(useStore.getState().chats)
-              );
-              // console.log(result);
-              const updatedMessages = updatedChats[currentChatIndex].messages;
+          try {
+            const url = 'https://google-translate1.p.rapidapi.com/language/translate/v2';
+            const options = {
+              method: 'POST',
+              headers: {
+                'content-type': 'application/x-www-form-urlencoded',
+                'Accept-Encoding': 'application/gzip',
+                'X-RapidAPI-Key': '03e3dedfe4mshb13f6210713b9c4p1c9f0ajsn48640a0b138c',
+                'X-RapidAPI-Host': 'google-translate1.p.rapidapi.com'
+              },
+              body: new URLSearchParams({
+                q: content,
+                target: 'en'
+              })
+            };
 
-              let status = result.status;
-              const task_id = result.task_id;
-              if (status == 1) {
-                let objectContent = new ObjectMessageContent();
-                objectContent.type = "image";
-                objectContent.status = 0;
-                objectContent.content = t("imageRunning") as string;
-                objectContent.task_id = task_id;
-                objectContent.ratio_x = ratioXY ? ratioXY[0] : undefined;
-                objectContent.ratio_y = ratioXY ? ratioXY[1] : undefined;
-                updatedMessages[updatedMessages.length - 1].content = JSON.stringify(objectContent);
-                setChats(updatedChats);
+            const response = await fetch(url, options);
+            const result = await response.json();
+            // console.log(result.data.translations[0].translatedText);
 
-                const checkQueue = setInterval(() => {
-                  if (!useStore.getState().generating) {
-                    if (waitForUpload) clearTimeout(waitForUpload);
-                    clearInterval(checkQueue);
-                    createMessage();
-                    return;
-                  }
+            var myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
 
-                  var myHeaders = new Headers();
-                  myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
+            var urlencoded = new URLSearchParams();
+            urlencoded.append("Authorization", `Bearer ${load("access_token")}`);
+            urlencoded.append("chat_id", currentChat.id);
+            urlencoded.append("role", currentChat.messages.at(-2) ? currentChat.messages.at(-2)!.role : "");
+            urlencoded.append("content", result.data.translations[0].translatedText ?? "");
+            urlencoded.append("ratio_x", ratioXY ? String(ratioXY[0]) : "1");
+            urlencoded.append("ratio_y", ratioXY ? String(ratioXY[1]) : "1");
 
-                  var urlencoded = new URLSearchParams();
-                  urlencoded.append("Authorization", `Bearer ${load("access_token")}`);
-                  urlencoded.append("task_id", task_id);
+            var requestOptions = {
+              method: 'POST',
+              headers: myHeaders,
+              body: urlencoded
+            };
 
-                  var requestOptions = {
-                    method: 'POST',
-                    headers: myHeaders,
-                    body: urlencoded
-                  };
+            await fetch(AppConfig.BASE_URL + AppConfig.TXT2IMG, requestOptions)
+              .then(response => {
+                // console.log(response);
+                return response.json()
+              })
+              .then(result => {
+                const updatedChats: ChatInterface[] = JSON.parse(
+                  JSON.stringify(useStore.getState().chats)
+                );
+                // console.log(result);
+                const updatedMessages = updatedChats[currentChatIndex].messages;
 
-                  fetch(AppConfig.BASE_URL + AppConfig.QUEUE_STATUS, requestOptions)
-                    .then(response => {
-                      // console.log(response);
-                      return response.json()
-                    })
-                    .then(result => {
-                      if (result.status == -1) {
-                        let objectContent = new ObjectMessageContent();
-                        objectContent.type = "image";
-                        updatedMessages[updatedMessages.length - 1].content = t("finishing") as string;
-                        setChats(updatedChats);
-                        objectContent.status = 1;
-                        objectContent.content = AppConfig.BASE_URL + AppConfig.GET_IMAGE + task_id;
-                        objectContent.task_id = task_id;
-                        objectContent.ratio_x = ratioXY ? ratioXY[0] : undefined;
-                        objectContent.ratio_y = ratioXY ? ratioXY[1] : undefined;
-                        waitForUpload = setTimeout(() => {
-                          // if (!useStore.getState().generating) {
-                          //   return;
-                          // }
-                          updatedMessages[updatedMessages.length - 1].content = JSON.stringify(objectContent);
-                          setChats(updatedChats);
-                          createMessage();
-                          setGenerating(false);
-                        }, 3000);
-                        clearInterval(checkQueue);
-                      }
-                    })
-                }, 2000);
-              }
-              if (status == 2) {
-                let objectContent = new ObjectMessageContent();
-                objectContent.type = "image";
-                objectContent.status = 0;
-                objectContent.content = t("imagePending") + result.priority + "/" + result.total + " " + t("queueTotal");
-                objectContent.task_id = task_id;
-                objectContent.ratio_x = ratioXY ? ratioXY[0] : undefined;
-                objectContent.ratio_y = ratioXY ? ratioXY[1] : undefined;
-                updatedMessages[updatedMessages.length - 1].content = JSON.stringify(objectContent);
-                setChats(updatedChats);
+                let status = result.status;
+                const task_id = result.task_id;
+                if (status == 1) {
+                  let objectContent = new ObjectMessageContent();
+                  objectContent.type = "image";
+                  objectContent.status = 0;
+                  objectContent.content = t("imageRunning") as string;
+                  objectContent.task_id = task_id;
+                  objectContent.ratio_x = ratioXY ? ratioXY[0] : undefined;
+                  objectContent.ratio_y = ratioXY ? ratioXY[1] : undefined;
+                  updatedMessages[updatedMessages.length - 1].content = JSON.stringify(objectContent);
+                  setChats(updatedChats);
 
-                const checkQueue = setInterval(() => {
-                  if (!useStore.getState().generating) {
-                    if (waitForUpload) clearTimeout(waitForUpload);
-                    clearInterval(checkQueue);
-                    createMessage();
-                    return;
-                  }
+                  const checkQueue = setInterval(() => {
+                    if (!useStore.getState().generating) {
+                      if (waitForUpload) clearTimeout(waitForUpload);
+                      clearInterval(checkQueue);
+                      createMessage();
+                      return;
+                    }
 
-                  var myHeaders = new Headers();
-                  myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
+                    var myHeaders = new Headers();
+                    myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
 
-                  var urlencoded = new URLSearchParams();
-                  urlencoded.append("Authorization", `Bearer ${load("access_token")}`);
-                  urlencoded.append("task_id", task_id);
+                    var urlencoded = new URLSearchParams();
+                    urlencoded.append("Authorization", `Bearer ${load("access_token")}`);
+                    urlencoded.append("task_id", task_id);
 
-                  var requestOptions = {
-                    method: 'POST',
-                    headers: myHeaders,
-                    body: urlencoded
-                  };
+                    var requestOptions = {
+                      method: 'POST',
+                      headers: myHeaders,
+                      body: urlencoded
+                    };
 
-                  fetch(AppConfig.BASE_URL + AppConfig.QUEUE_STATUS, requestOptions)
-                    .then(response => {
-                      // console.log(response);
-                      return response.json()
-                    })
-                    .then(result => {
-                      switch (result.status) {
-                        case -1:
-                          objectContent = new ObjectMessageContent();
+                    fetch(AppConfig.BASE_URL + AppConfig.QUEUE_STATUS, requestOptions)
+                      .then(response => {
+                        // console.log(response);
+                        return response.json()
+                      })
+                      .then(result => {
+                        if (result.status == -1) {
+                          let objectContent = new ObjectMessageContent();
                           objectContent.type = "image";
                           updatedMessages[updatedMessages.length - 1].content = t("finishing") as string;
                           setChats(updatedChats);
@@ -387,58 +359,125 @@ const useSubmit = () => {
                             setGenerating(false);
                           }, 3000);
                           clearInterval(checkQueue);
-                          break;
-                        case 1:
-                          objectContent.content = t("imageRunning") as string;
-                          updatedMessages[updatedMessages.length - 1].content = JSON.stringify(objectContent);
-                          setChats(updatedChats);
-                          break;
-                        case 2:
-                          objectContent.content = t("imagePending") + result.priority + "/" + result.total + " " + t("queueTotal");
-                          updatedMessages[updatedMessages.length - 1].content = JSON.stringify(objectContent);
-                          setChats(updatedChats);
-                          break;
-                      }
-                    })
-                }, 2000);
-              }
+                        }
+                      })
+                  }, 2000);
+                }
+                if (status == 2) {
+                  let objectContent = new ObjectMessageContent();
+                  objectContent.type = "image";
+                  objectContent.status = 0;
+                  objectContent.content = t("imagePending") + result.priority + "/" + result.total + " " + t("queueTotal");
+                  objectContent.task_id = task_id;
+                  objectContent.ratio_x = ratioXY ? ratioXY[0] : undefined;
+                  objectContent.ratio_y = ratioXY ? ratioXY[1] : undefined;
+                  updatedMessages[updatedMessages.length - 1].content = JSON.stringify(objectContent);
+                  setChats(updatedChats);
 
-              // setChats(updatedChats);
-              // setGenerating(false);
-              // console.log("abc");
-              // let currentChat: ChatInterface = JSON.parse(
-              //   JSON.stringify(useStore.getState().chats)
-              // )[currentChatIndex];
-              // var myHeaders = new Headers();
-              // myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
+                  const checkQueue = setInterval(() => {
+                    if (!useStore.getState().generating) {
+                      if (waitForUpload) clearTimeout(waitForUpload);
+                      clearInterval(checkQueue);
+                      createMessage();
+                      return;
+                    }
 
-              // var urlencoded = new URLSearchParams();
-              // urlencoded.append("Authorization", `Bearer ${load("access_token")}`);
-              // urlencoded.append("id", currentChat.id);
-              // urlencoded.append("config", JSON.stringify(currentChat.config));
-              // urlencoded.append("title", currentChat.title);
-              // urlencoded.append("titleSet", currentChat.titleSet ? "1" : "0");
-              // urlencoded.append("chat_id", currentChat.id);
-              // urlencoded.append("role", currentChat.messages.at(-1) ? currentChat.messages.at(-1)!.role : "");
-              // urlencoded.append("content", currentChat.messages.at(-1) ? currentChat.messages.at(-1)!.content : "");
-              // var requestOptions = {
-              //   method: 'POST',
-              //   headers: myHeaders,
-              //   body: urlencoded
-              // };
-              // fetch(AppConfig.BASE_URL + AppConfig.CHAT_MESSAGE_CREATE, requestOptions)
-              //   .then(response => {
-              //     return response.status;
-              //   })
-              //   .catch(error => {
-              //     console.error('Error:', error);
-              //   })
-            })
-            .catch(error => {
-              console.error('Error:', error);
+                    var myHeaders = new Headers();
+                    myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
 
-              setGenerating(false);
-            });
+                    var urlencoded = new URLSearchParams();
+                    urlencoded.append("Authorization", `Bearer ${load("access_token")}`);
+                    urlencoded.append("task_id", task_id);
+
+                    var requestOptions = {
+                      method: 'POST',
+                      headers: myHeaders,
+                      body: urlencoded
+                    };
+
+                    fetch(AppConfig.BASE_URL + AppConfig.QUEUE_STATUS, requestOptions)
+                      .then(response => {
+                        // console.log(response);
+                        return response.json()
+                      })
+                      .then(result => {
+                        switch (result.status) {
+                          case -1:
+                            objectContent = new ObjectMessageContent();
+                            objectContent.type = "image";
+                            updatedMessages[updatedMessages.length - 1].content = t("finishing") as string;
+                            setChats(updatedChats);
+                            objectContent.status = 1;
+                            objectContent.content = AppConfig.BASE_URL + AppConfig.GET_IMAGE + task_id;
+                            objectContent.task_id = task_id;
+                            objectContent.ratio_x = ratioXY ? ratioXY[0] : undefined;
+                            objectContent.ratio_y = ratioXY ? ratioXY[1] : undefined;
+                            waitForUpload = setTimeout(() => {
+                              // if (!useStore.getState().generating) {
+                              //   return;
+                              // }
+                              updatedMessages[updatedMessages.length - 1].content = JSON.stringify(objectContent);
+                              setChats(updatedChats);
+                              createMessage();
+                              setGenerating(false);
+                            }, 3000);
+                            clearInterval(checkQueue);
+                            break;
+                          case 1:
+                            objectContent.content = t("imageRunning") as string;
+                            updatedMessages[updatedMessages.length - 1].content = JSON.stringify(objectContent);
+                            setChats(updatedChats);
+                            break;
+                          case 2:
+                            objectContent.content = t("imagePending") + result.priority + "/" + result.total + " " + t("queueTotal");
+                            updatedMessages[updatedMessages.length - 1].content = JSON.stringify(objectContent);
+                            setChats(updatedChats);
+                            break;
+                        }
+                      })
+                  }, 2000);
+                }
+
+                // setChats(updatedChats);
+                // setGenerating(false);
+                // console.log("abc");
+                // let currentChat: ChatInterface = JSON.parse(
+                //   JSON.stringify(useStore.getState().chats)
+                // )[currentChatIndex];
+                // var myHeaders = new Headers();
+                // myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
+
+                // var urlencoded = new URLSearchParams();
+                // urlencoded.append("Authorization", `Bearer ${load("access_token")}`);
+                // urlencoded.append("id", currentChat.id);
+                // urlencoded.append("config", JSON.stringify(currentChat.config));
+                // urlencoded.append("title", currentChat.title);
+                // urlencoded.append("titleSet", currentChat.titleSet ? "1" : "0");
+                // urlencoded.append("chat_id", currentChat.id);
+                // urlencoded.append("role", currentChat.messages.at(-1) ? currentChat.messages.at(-1)!.role : "");
+                // urlencoded.append("content", currentChat.messages.at(-1) ? currentChat.messages.at(-1)!.content : "");
+                // var requestOptions = {
+                //   method: 'POST',
+                //   headers: myHeaders,
+                //   body: urlencoded
+                // };
+                // fetch(AppConfig.BASE_URL + AppConfig.CHAT_MESSAGE_CREATE, requestOptions)
+                //   .then(response => {
+                //     return response.status;
+                //   })
+                //   .catch(error => {
+                //     console.error('Error:', error);
+                //   })
+              })
+              .catch(error => {
+                console.error('Error:', error);
+
+                setGenerating(false);
+              });
+
+          } catch (error) {
+            console.error(error);
+          }
 
           const currChats = useStore.getState().chats;
           if (
@@ -582,7 +621,7 @@ const useSubmit = () => {
     }
   };
 
-  const createMessage = async() => {
+  const createMessage = async () => {
     let currentChat: ChatInterface = JSON.parse(
       JSON.stringify(useStore.getState().chats)
     )[currentChatIndex];
@@ -608,7 +647,7 @@ const useSubmit = () => {
       })
   }
 
-  const updateMessage = async(updatedChats: ChatInterface[]) => {
+  const updateMessage = async (updatedChats: ChatInterface[]) => {
     var myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
 
