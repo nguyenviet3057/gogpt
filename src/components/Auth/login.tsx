@@ -316,7 +316,7 @@ export default function login(props: any) {
                         :
                         checkedAuth ?
                             <>
-                                <LoginSocialFacebook
+                                {/* <LoginSocialFacebook
                                     appId='971391800706097'
                                     onResolve={(response) => loginSuccess(response)}
                                     onReject={(error) => {
@@ -324,7 +324,7 @@ export default function login(props: any) {
                                     }}
                                 >
                                     <FacebookLoginButton style={{ width: '240px' }} />
-                                </LoginSocialFacebook>
+                                </LoginSocialFacebook> */}
                                 <EmailLoginButton style={{ width: '240px' }} icon={"envelope"} onClick={handleLogin} />
                                 <div className='register-email'><span onClick={() => handleRegister(true)}>Register with email ?</span></div>
                             </>
